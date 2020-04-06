@@ -1,0 +1,615 @@
+catalog.h0000640002636200531540000000223513642466153012076 0ustar  lichelupg11506#include <iostream>
+#include <fstream>
+#include <string>
+#include <cmath>
+
+using namespace std;
+
+struct wizard {
+    string name;
+    int id;
+    string password;
+    string position_title; 
+    float beard_length;
+};
+
+struct spellbook {
+    string title;
+    string author;
+    int num_pages;
+    int edition;
+    int num_spells;
+    float avg_success_rate;
+    struct spell* s;
+};
+
+struct spell {
+    string name;
+    float success_rate;
+    string effect; 
+};
+
+bool file_exists(string);
+int get_int(string);
+bool is_int(string);
+float get_float(string);
+float round_float(float);
+float average_success_rate(spellbook, int);
+bool bad(spellbook*, int);
+int enter_id();
+int login(wizard*, int);
+void sort_pages(spellbook*, int);
+void spell_values(spellbook*, spell*, int*, int);
+void sort_effect(spell*, int*, int);
+void sort_success(spellbook*, int);
+void get_wizard_data(wizard*, int, ifstream&);
+wizard* create_wizards(int);
+void get_spell_data(spell*, int, ifstream&);
+spell* create_spells(int);
+void get_spellbook_data(spellbook*, int, ifstream&);
+spellbook* create_spellbooks(int);
+void delete_info(wizard*, spellbook*, int);catalog.cpp0000640002636200531540000004047313642505550012432 0ustar  lichelupg11506#include "./catalog.h"
+
+/**************************************************************************************************************
+ ** Function: file_exists
+ ** Description: Checks if a file exists.
+ ** Parameters: string file
+ ** Pre-Conditions: 1 string
+ ** Post-Conditions: Returns a bool to indicate if a file exists.
+**************************************************************************************************************/
+bool file_exists(string file) {
+    ifstream in_stream(file.c_str());
+    
+    if (in_stream)
+        return true;
+        
+    return false;
+}
+
+/**************************************************************************************************************
+ ** Function: get_int
+ ** Description: Converts a string to an int.
+ ** Parameters: string n
+ ** Pre-Conditions: 1 string
+ ** Post-Conditions: Returns the int value of the given string.
+**************************************************************************************************************/
+int get_int(string n) {
+    int num = 0;
+
+    for (int x = 0; x < n.length(); x++)
+        num += (n[x] - 48) * pow(10, n.length() - x - 1);
+
+    return num;
+}
+
+/**************************************************************************************************************
+ ** Function: is_int
+ ** Description: Indicates if the given string is an int.
+ ** Parameters: string n
+ ** Pre-Conditions: 1 string
+ ** Post-Conditions: Returns a bool indicating if the string is an int.
+**************************************************************************************************************/
+bool is_int(string n) {
+    for (int x = 0; x < n.length(); x++)
+        if (n[x] < '0' || n[x] > '9')
+            return false;
+    
+    return true;
+}
+
+/**************************************************************************************************************
+ ** Function: get_float
+ ** Description: Converts a string to a float.
+ ** Parameters: string n
+ ** Pre-Conditions: 1 string
+ ** Post-Conditions: Returns the float value of the given string.
+**************************************************************************************************************/
+float get_float(string n) {
+    int decimal_point = n.length();
+    float num = 0;
+
+    for (int x = 0; x < n.length(); x++)
+        if (n[x] == '.') {
+            decimal_point = x;
+            break;
+        }
+
+    for (int x = 0; x < decimal_point; x++)
+        num += (n[x] - 48) * pow(10, decimal_point - x - 1);
+    
+    if (n.length() != decimal_point)
+        for (int x = decimal_point + 1; x < n.length(); x++) 
+            num += (n[x] - 48) * pow(0.1, x - decimal_point);
+
+    return num;
+}
+
+/**************************************************************************************************************
+ ** Function: round_float
+ ** Description: Rounds a float to the hundreth place.
+ ** Parameters: float num
+ ** Pre-Conditions: 1 float
+ ** Post-Conditions: Returns a float rounded to the hundreth place.
+**************************************************************************************************************/
+float round_float(float num) { 
+    float n = (int) (num * 100 + 0.5); 
+    return (float) n / 100; 
+} 
+
+/**************************************************************************************************************
+ ** Function: average_success_rate
+ ** Description: Calculates the average success rate of the spells in a spellbook.
+ ** Parameters: spellbook* spellbooks, int n
+ ** Pre-Conditions: 1 1D spellbook struct array and 1 int
+ ** Post-Conditions: Calculates the average success rate.
+**************************************************************************************************************/
+float average_success_rate(spellbook the_spellbook, int n) { 
+    float average = 0;
+    
+    for (int x = 0; x < n; x++)
+        average += the_spellbook.s[x].success_rate;
+    
+    average /= the_spellbook.num_spells;
+    return round_float(average);
+}
+
+/**************************************************************************************************************
+ ** Function: bad
+ ** Description: Indicates if there's a poison or death spell in a spellbook.
+ ** Parameters: spellbook* spellbooks, int index
+ ** Pre-Conditions: 1 1D spellbook struct array and 1 int
+ ** Post-Conditions: Returns a bool indicating if there's a poison or death spell in a spellbook.
+**************************************************************************************************************/
+bool bad(spellbook* spellbooks, int index) {
+    for (int x = 0; x < spellbooks[index].num_spells; x++)
+        if (spellbooks[index].s[x].effect == "poison" || spellbooks[index].s[x].effect == "death")
+            return true;
+
+    return false;
+}
+
+/**************************************************************************************************************
+ ** Function: enter_id
+ ** Description: Checks if the user enters an int for the id.
+ ** Parameters: nothing
+ ** Pre-Conditions: nothing
+ ** Post-Conditions: Returns the int value of the id.
+**************************************************************************************************************/
+int enter_id() {
+    bool valid_int = false;
+    string id = "";
+    
+    while (!valid_int) {
+        cout << "Please enter your id: ";
+        cin >> id;
+        
+        if (is_int(id))
+            return get_int(id);
+        
+        cout << "The id must be an int." <<endl;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: login
+ ** Description: Checks if the user enters the right login info.
+ ** Parameters: wizard* wizards, int n
+ ** Pre-Conditions: 1 1D wizard struct array and 1 int
+ ** Post-Conditions: Returns the index of the logged in user in the wizards array.
+**************************************************************************************************************/
+int login(wizard* wizards, int n) {
+    bool valid_login = false;
+    int id = 0, invalid = 0;
+    string password = "";
+
+    while (!valid_login) {
+        id = enter_id();
+        
+        cout << "Please enter your password: ";
+        cin >> password;
+    
+        for (int x = 0; x < n; x++)
+            if (id == wizards[x].id && password == wizards[x].password)
+                return x;
+    
+        cout << "Incorrect id or password" <<endl;
+        invalid++;
+    
+        if (invalid == 3)
+            valid_login = true;
+    }
+    
+    cout << "You've entered the wrong id or password too many times." <<endl;
+    
+    return -1;
+}
+
+/**************************************************************************************************************
+ ** Function: sort_pages
+ ** Description: Sorts the list of spellbooks according to number of pages.
+ ** Parameters: spellbook* spellbooks, int n
+ ** Pre-Conditions: 1 1D spellbook struct array and 1 int
+ ** Post-Conditions: Sorts the list of spellbooks according to number of pages in accending order.
+**************************************************************************************************************/
+void sort_pages(spellbook* spellbooks, int n) {
+    for (int x = 0; x < n; x++) 
+        for (int i = x; i < n; i++) 
+            if (spellbooks[i].num_pages < spellbooks[x].num_pages) {
+                spellbook temp = spellbooks[x];
+                spellbooks[x] = spellbooks[i];
+                spellbooks[i] = temp;
+            }
+}
+
+/**************************************************************************************************************
+ ** Function: spell_values
+ ** Description: Collects all of spells and gives the effects of the spells a value.
+ ** Parameters: spellbook* spellbooks, spell* spells, int* spell_val, int n
+ ** Pre-Conditions: 1 1D spellbook struct array, 1 1D spell struct array, 1 1D int array, and 1 int
+ ** Post-Conditions: Changes the values of an object in the 2D array treasure object.
+**************************************************************************************************************/
+void spell_values(spellbook* spellbooks, spell* spells, int* spell_val, int n) {
+    int index = 0;
+
+    for (int x = 0; x < n; x++)
+        for (int i = 0; i < spellbooks[x].num_spells; i++) {
+            spells[index] = spellbooks[x].s[i];
+            
+            if (spells[index].effect == "bubble") {
+                spell_val[index] = 1;
+            } else if (spells[index].effect == "memory_loss") {
+                spell_val[index] = 2;
+            } else if (spells[index].effect == "fire") {
+                spell_val[index] = 3;
+            } else if (spells[index].effect == "poison") {
+                spell_val[index] = 4;
+            } else if (spells[index].effect == "death") {
+                spell_val[index] = 5;
+            }
+            
+            index++;
+        }
+    
+    cout <<endl;
+}
+
+/**************************************************************************************************************
+ ** Function: sort_effect
+ ** Description: Sorts the spells by their effects.
+ ** Parameters: spell* spells, int* spell_val, int n
+ ** Pre-Conditions: 1 1D spell struct array, 1 1D int array, and 1 int
+ ** Post-Conditions: Sorts the spells by their effects (bubbles, memory_loss, fire, poison, then death).
+**************************************************************************************************************/
+void sort_effect(spell* spells, int* spell_val, int n) {
+    for (int x = 0; x < n; x++) 
+        for (int i = x; i < n; i++) 
+            if (spell_val[i] < spell_val[x]) {
+                int num_temp = spell_val[x];
+                spell_val[x] = spell_val[i];
+                spell_val[i] = num_temp;
+
+                spell temp = spells[x];
+                spells[x] = spells[i];
+                spells[i] = temp;
+            }
+}
+
+/**************************************************************************************************************
+ ** Function: sort_success
+ ** Description: Sorts the spellbooks by average success rate.
+ ** Parameters: spellbook* spellbooks, int n
+ ** Pre-Conditions: 1 1D spellbook struct array and 1 int
+ ** Post-Conditions: Sorts the spellbooks by avereage success rate in ascending order.
+**************************************************************************************************************/
+void sort_success(spellbook* spellbooks, int n) {
+    for (int x = 0; x < n; x++) 
+        for (int i = x; i < n; i++) 
+            if (spellbooks[i].avg_success_rate < spellbooks[x].avg_success_rate) {
+                spellbook temp = spellbooks[x];
+                spellbooks[x] = spellbooks[i];
+                spellbooks[i] = temp;
+            }
+}
+
+/**************************************************************************************************************
+ ** Function: get_wizard_data
+ ** Description: Collects the information on each wizard.
+ ** Parameters: wizard* wizards, int index, ifstream& in_stream
+ ** Pre-Conditions: 1 1D wizard struct array, 1 int, and 1 ifstream&
+ ** Post-Conditions: Records information from "wizard.txt" in wizard struct and array.
+**************************************************************************************************************/
+void get_wizard_data(wizard* wizards, int index, ifstream& in_stream) {
+    int num_words = 0;
+    string word = "";
+
+    while (in_stream >> word) {
+        if (num_words == 0) {
+            wizards[index].name = word;
+        } else if (num_words == 1) {
+            wizards[index].id = get_int(word);
+        } else if (num_words == 2) {
+            wizards[index].password = word;
+        } else if (num_words == 3) {
+            wizards[index].position_title = word;
+        } else if (num_words == 4) {
+            wizards[index].beard_length = get_float(word);
+            break;
+        }
+    
+        num_words++;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: create_wizards
+ ** Description: Creates a wizard array.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int
+ ** Post-Conditions: Returns a dynamically allocated wizard array.
+**************************************************************************************************************/
+wizard* create_wizards(int n) {
+    return new wizard[n];
+}
+
+/**************************************************************************************************************
+ ** Function: get_spell_data
+ ** Description: Collects the information on each spell from a spellbook.
+ ** Parameters: spell* spells, int num_spells, ifstream& in_stream
+ ** Pre-Conditions: 1 1D spell struct array, 1 int, and 1 ifstream&
+ ** Post-Conditions: Records information from "spellbooks.txt" in spell struct and array.
+**************************************************************************************************************/
+void get_spell_data(spell* spells, int num_spells, ifstream& in_stream) {
+    string word = "";
+
+    for (int x = 0; x < num_spells; x++) {
+        int num_words = 0;
+
+        while (in_stream >> word) {
+            if (num_words == 0) {
+                spells[x].name = word;
+            } else if (num_words == 1) {
+                spells[x].success_rate = get_float(word);
+            } else if (num_words == 2) {
+                spells[x].effect = word;
+                break;
+            }
+            
+            num_words++;
+        }
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: create_spells
+ ** Description: Creates a spell array.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int
+ ** Post-Conditions: Returns a dynamically allocated spell array.
+**************************************************************************************************************/
+spell* create_spells(int n) {
+    return new spell[n];
+}
+
+/**************************************************************************************************************
+ ** Function: get_spellbook_data
+ ** Description: Collects the information on each spellbook.
+ ** Parameters: spellbook* spellbooks, int index, ifstream& in_stream
+ ** Pre-Conditions: 1 1D spellbook struct array, 1 int, and 1 ifstream&
+ ** Post-Conditions: Records information from "spellbooks.txt" in spellbook struct and array.
+**************************************************************************************************************/
+void get_spellbook_data(spellbook* spellbooks, int index, ifstream& in_stream) {
+    int num_words = 0;
+    string word = "";
+
+    while (in_stream >> word) {
+        if (num_words == 0) {
+            spellbooks[index].title = word;
+        } else if (num_words == 1) {
+            spellbooks[index].author = word;
+        } else if (num_words == 2) {
+            spellbooks[index].num_pages = get_int(word);
+        } else if (num_words == 3) {
+            spellbooks[index].edition = get_int(word);
+        } else if (num_words == 4) {
+            spellbooks[index].num_spells = get_int(word);
+            break;
+        }
+        
+        num_words++;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: create_spellbooks
+ ** Description: Creates a spellbook array.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int
+ ** Post-Conditions: Returns a dynamically allocated spellbook array.
+**************************************************************************************************************/
+spellbook* create_spellbooks(int n) {
+    return new spellbook[n];
+}
+
+/**************************************************************************************************************
+ ** Function: delete_info
+ ** Description: Deletes the dynamically allocated arrays.
+ ** Parameters: wizard* wizards, spellbook* spellbooks
+ ** Pre-Conditions: 1 1D wizard struct array and 1 1D spellbook struct array
+ ** Post-Conditions: Deletes all memory that was dynamically allocated.
+**************************************************************************************************************/
+void delete_info(wizard* wizards, spellbook* spellbooks, int spellbooks_size) {
+    delete [] wizards;
+    
+    for (int x = 0; x < spellbooks_size; x++)
+        delete [] spellbooks[x].s;
+    
+    delete [] spellbooks;
+}run_wizard.cpp0000640002636200531540000001637113642504215013201 0ustar  lichelupg11506#include "./catalog.h"
+
+/******************************************************
+** Program: run_catalog.cpp
+** Author: Chelsea Li
+** Date: 4/12/20
+** Description: Wizard Spellbook Catalog 
+** Input: Txt files
+** Output: The catalogs
+******************************************************/
+int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        cout << "Two files need to be provided." <<endl;
+    } else if (!file_exists(argv[1]) || !file_exists(argv[2])) {
+        cout << "At least one of these files don't exist." <<endl;
+    } else {
+        bool done = false;
+        int id = 0, wizards_size = 0, spellbooks_size = 0, num_spells = 0, choice = 0, display = 0;
+        ifstream in_stream;
+        string line = "", password = "", filename = "";
+    
+        in_stream.open(argv[1]);
+        in_stream >> line;
+        wizards_size = get_int(line);
+        wizard* wizards = create_wizards(wizards_size);
+
+        for (int x = 0; x < wizards_size; x++)
+            get_wizard_data(wizards, x, in_stream);
+        
+        in_stream.close();
+    
+        in_stream.open(argv[2]);
+        in_stream >> line;
+        spellbooks_size = get_int(line);
+        spellbook* spellbooks = create_spellbooks(spellbooks_size);
+
+        for (int x = 0; x < spellbooks_size; x++) {
+            get_spellbook_data(spellbooks, x, in_stream);
+            spell* spells = create_spells(spellbooks[x].num_spells);
+            get_spell_data(spells, spellbooks[x].num_spells, in_stream);
+            spellbooks[x].s = spells;
+            spellbooks[x].avg_success_rate = average_success_rate(spellbooks[x], spellbooks[x].num_spells);
+        }
+
+        in_stream.close();
+    
+        for (int x = 0; x < spellbooks_size; x++)
+            num_spells += spellbooks[x].num_spells;
+
+        spell spells[num_spells];
+        int spell_val[num_spells];
+        spell_values(spellbooks, spells, spell_val, spellbooks_size);
+    
+        int wizard_login = login(wizards, wizards_size);
+    
+        if (wizard_login != -1) {
+            cout << "\nWelcome " << wizards[wizard_login].name <<endl;
+            cout << "ID: " << wizards[wizard_login].id <<endl;
+            cout << "Status: " << wizards[wizard_login].position_title <<endl;
+            cout << "Beard Length: " << wizards[wizard_login].beard_length <<endl;
+    
+            while (!done) {
+                bool valid = false;
+                
+                while (!valid) {
+                    cout << "\nWhich option would you like to choose?" <<endl;
+                    cout << "Sort spellbooks by number of pages (Press 1)" <<endl;
+                    cout << "Group spells by their effect (Press 2)" <<endl;
+                    cout << "Sort spellbooks by average success rate (Press 3)" <<endl;
+                    cout << "Quit (Press 4)" <<endl;
+                    cin >> choice;
+                    
+                    if (choice < 1 || choice > 4){
+                        cin.clear();
+                        cin.ignore(256, '\n');
+                        cout << "Invalid choice, try again." <<endl;
+                    } else {
+                        valid = true;
+                    }
+                }
+                
+                if (choice == 4) {
+                    done = true;
+                } else {
+                    while (valid) {
+                        cout << "How would you like the information displayed?" <<endl;
+                        cout << "Print to screen (Press 1)" <<endl;
+                        cout << "Print to file (Press 2)" <<endl;
+                        cin >> display;
+                        
+                        if (display < 1 || display > 2) {
+                            cin.clear();
+                            cin.ignore(256, '\n');
+                            cout << "Invalid option, try again." <<endl;
+                        } else {
+                            valid = false;
+                        }
+                    }
+                    
+                    if (choice == 1)
+                        sort_pages(spellbooks, spellbooks_size);
+                    else if (choice == 2)
+                        sort_effect(spells, spell_val, num_spells);
+                    else if (choice == 3)
+                        sort_success(spellbooks, spellbooks_size);
+    
+                    if (display == 1) {
+                        if (choice == 1 || choice == 3)
+                            for (int x = 0; x < spellbooks_size; x++) {
+                                bool poison_death = bad(spellbooks, x);
+    
+                                if (!poison_death || (poison_death && wizards[wizard_login].position_title != "Student"))
+                                    if (choice == 1)
+                                        cout << spellbooks[x].title << " " << spellbooks[x].num_pages <<endl;                              
+                                    else if (choice == 3)
+                                        cout << spellbooks[x].title << " " << spellbooks[x].avg_success_rate <<endl;
+                            }
+                        else if (choice == 2)
+                            for (int x = 0; x < num_spells; x++)
+                                if (wizards[wizard_login].position_title == "Student" && (spells[x].effect == "poison" || spells[x].effect == "death"))
+                                    continue;
+                                else
+                                    cout << spells[x].name << " " << spells[x].effect <<endl;
+                    } else if (display == 2) {
+                        ofstream out_stream;
+    
+                        cout << "Please provide desired filename: ";
+                        cin >> filename;
+    
+                        out_stream.open(filename.c_str(), ios::app);
+    
+                        if (choice == 1 || choice == 3)
+                            for (int x = 0; x < spellbooks_size; x++) {
+                                bool poison_death = bad(spellbooks, x);
+    
+                                if (!poison_death || (poison_death && wizards[wizard_login].position_title != "Student"))
+                                    if (choice == 1)
+                                        out_stream << spellbooks[x].title << " " << spellbooks[x].num_pages <<endl;                              
+                                    else if (choice == 3)
+                                        out_stream << spellbooks[x].title << " " << spellbooks[x].avg_success_rate <<endl;
+                            }
+                        else if (choice == 2)
+                            for (int x = 0; x < num_spells; x++)
+                                if (wizards[wizard_login].position_title == "Student" && (spells[x].effect == "poison" || spells[x].effect == "death"))
+                                    continue;
+                                else
+                                    out_stream << spells[x].name << " " << spells[x].effect <<endl;
+    
+                        out_stream.close();
+                        cout << "Appended requested information to file" <<endl;
+                    }
+                }
+            }
+        }
+    
+        delete_info(wizards, spellbooks, spellbooks_size);
+    }
+    
+    return 0;
+}Makefile0000640002636200531540000000040413642455470011747 0ustar  lichelupg11506CC = g++ -std=c++11
+exe_file = catalog_prog
+$(exe_file): catalog.o run_wizard.o
+	$(CC) catalog.o run_wizard.o -o $(exe_file)
+catalog.o: catalog.cpp
+	$(CC) -c catalog.cpp
+run_wizard.o: run_wizard.cpp
+	$(CC) -c run_wizard.cpp
+clean:
+	rm -f *.out *.o $(exe_file)
