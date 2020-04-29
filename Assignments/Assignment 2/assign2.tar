@@ -1,0 +1,814 @@
+prog_card.h0000660002636200531540000000065013650476662012432 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
+using namespace std;
+
+class Card {
+    private:
+        int rank;  // Should be in the range 0-12.
+        int suit;  // Should be in the range 0-3.
+    public:
+        Card(){};
+        Card(int, int);
+        int get_rank();
+        int get_suit();
+        void set_suit(int);
+        string convert_rank(int);
+        string convert_suit(int);
+};prog_deck.h0000660002636200531540000000070613650462705012422 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
+using namespace std;
+
+class Deck {
+    private:
+        Card cards[52];
+        int n_cards;  // Number of cards remaining in the deck.
+        Card top_card;
+    public:
+        Deck();
+        Card get_card(int);
+        int get_n_cards();
+        Card get_top_card();
+        void reduce_n_cards_deck();
+        void set_top_card(Card);
+        void set_top_card_suit(int);
+};prog_hand.h0000660002636200531540000000063513650462701012423 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
+using namespace std;
+
+class Hand {
+    private:
+        Card* cards;
+        int n_cards;  // Number of cards in the hand.
+    public:
+        Hand(){};
+        Hand(Deck&);
+        Card get_card_hand(int);
+        Card* get_cards();
+        int get_n_cards_hand();
+        void add_cards(Deck&);
+        void remove_cards(int, Deck&);
+};prog_player.h0000660002636200531540000000053513650462677013020 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
+using namespace std;
+
+class Player {
+    private:
+        Hand hand;
+        string name;
+    public:
+        Player(){};
+        Player(string, Deck&);
+        Hand get_hand();
+        string get_name();
+        void set_hand(int, int, Deck&);
+        void print_hand();
+};prog_game.h0000660002636200531540000000075613650462673012436 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
+using namespace std;
+
+class Game {
+    private:
+        Deck cards;
+        Player players[2];
+    public:
+        Game();
+        ~Game();
+        Player get_player(int);
+        bool playable(int);
+        int get_int(string);
+        bool works(int, int);
+        int valid_choice();
+        int wild_card();
+        void player_turn();  
+        void computer_turn();
+        bool win(); 
+        int end_game();
+};prog_card.cpp0000660002636200531540000000713713650467142012765 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+#include "./prog_card.h"
+#include "./prog_deck.h"
+#include "./prog_hand.h"
+#include "./prog_player.h"
+#include "./prog_game.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Card
+ ** Description: Initializes objects of Card class.
+ ** Parameters: int rank_val, int suit_val
+ ** Pre-Conditions: 2 ints.
+ ** Post-Conditions: Initializes the rank and suit variables in the Card class.
+**************************************************************************************************************/
+Card::Card(int rank_val, int suit_val) {
+    rank = rank_val;
+    suit = suit_val;
+}
+
+/**************************************************************************************************************
+ ** Function: get_rank
+ ** Description: Gives you the value of the rank variable in the Card class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the rank variable.
+**************************************************************************************************************/
+int Card::get_rank() {
+    return rank;
+}
+
+/**************************************************************************************************************
+ ** Function: get_suit
+ ** Description: Gives you the value of the suit variable in the Card class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the suit variable.
+**************************************************************************************************************/
+int Card::get_suit() {
+    return suit;
+}
+
+/**************************************************************************************************************
+ ** Function: set_suit
+ ** Description: Changes the value of the suit variable in the Card class.
+ ** Parameters: int suit_val
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: The value of the suit variable is changed to a new value.
+**************************************************************************************************************/
+void Card::set_suit(int suit_val) {
+    suit = suit_val;
+}
+
+/**************************************************************************************************************
+ ** Function: convert_rank
+ ** Description: Converts the value of the rank variable in the Card class to its respective representation.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: Returns the string value of the converted rank variable.
+**************************************************************************************************************/
+string Card::convert_rank(int n) {
+    if (n >= 1 && n <= 9)
+        return to_string(n + 1);
+    else if (n == 0)
+        return "A";
+    else if (n == 10)
+        return  "J";
+    else if (n == 11)
+        return "Q";
+    else if (n == 12)
+        return "K";
+}
+
+/**************************************************************************************************************
+ ** Function: convert_suit
+ ** Description: Converts the value of the suit variable in the Card class to its respective representation.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: Returns the string value of the converted suit variable.
+**************************************************************************************************************/
+string Card::convert_suit(int n) {
+    if (n == 0)
+        return "clubs";
+    else if (n == 1)
+        return "diamonds";
+    else if (n == 2)
+        return "hearts";
+    else if (n == 3)
+        return "spades";
+
+}prog_deck.cpp0000660002636200531540000001012513650470347012752 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+#include "./prog_card.h"
+#include "./prog_deck.h"
+#include "./prog_hand.h"
+#include "./prog_player.h"
+#include "./prog_game.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Deck
+ ** Description: Initializes objects of Deck class.
+ ** Parameters: None
+ ** Pre-Conditions: None
+ ** Post-Conditions: Initializes the n_cards, cards, and top_card variables in the Card class.
+**************************************************************************************************************/
+Deck::Deck() {
+    srand(time(NULL));
+    n_cards = 0;
+
+    for (int x = 0; x < 13; x++)
+        for (int i = 0; i < 4; i++) {
+            cards[n_cards] = Card(x, i);
+            n_cards++;
+        } 
+
+    for (int x = 0; x < 52; x++) {
+        int index = x;
+
+        while (index == x)
+            index = rand() % 52;
+
+        Card random_card = cards[index];
+        cards[index] = cards[x];
+        cards[x] = random_card;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: get_card
+ ** Description: Gives you the value of the card in the cards variable in the Deck class.
+ ** Parameters: int index
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: Returns a card in the cards variable.
+**************************************************************************************************************/
+Card Deck::get_card(int index) {
+    return cards[index];
+}
+
+/**************************************************************************************************************
+ ** Function: get_n_cards
+ ** Description: Gives you the value of the n_cards variable in the Deck class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the n_cards variable.
+**************************************************************************************************************/
+int Deck::get_n_cards() {
+    return n_cards;
+}
+
+/**************************************************************************************************************
+ ** Function: get_top_card
+ ** Description: Gives you the value of the top_card variable in the Deck class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the top_card variable.
+**************************************************************************************************************/
+Card Deck::get_top_card() {
+    return top_card;
+}
+
+/**************************************************************************************************************
+ ** Function: set_top_card
+ ** Description: Changes the value of the top_card variable in the Deck class.
+ ** Parameters: Card card
+ ** Pre-Conditions: 1 Card.
+ ** Post-Conditions: The value of the top_card variable is changed to a new value.
+**************************************************************************************************************/
+void Deck::set_top_card(Card card) {
+    top_card = card;
+}
+
+/**************************************************************************************************************
+ ** Function: set_top_card_suit
+ ** Description: Changes the value of the rank for the top_card variable in the Deck class.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: The value of rank for the top_card variable is changed to a new value.
+**************************************************************************************************************/
+void Deck::set_top_card_suit(int n) {
+    top_card.set_suit(n);
+}
+
+/**************************************************************************************************************
+ ** Function: reduce_n_cards_deck
+ ** Description: Reduces the value of the n_cards variable in the Deck class by 1.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The value of the n_cards is reduced by 1.
+**************************************************************************************************************/
+void Deck::reduce_n_cards_deck() {
+    n_cards--;
+}
+prog_hand.cpp0000660002636200531540000000752613650472702012766 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+#include "./prog_card.h"
+#include "./prog_deck.h"
+#include "./prog_hand.h"
+#include "./prog_player.h"
+#include "./prog_game.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Hand
+ ** Description: Initializes objects of Hand class.
+ ** Parameters: Deck& card_deck
+ ** Pre-Conditions: 1 Deck&.
+ ** Post-Conditions: Initializes the cards and n_cards variable in Hand class.
+**************************************************************************************************************/
+Hand::Hand(Deck& card_deck) {
+    n_cards = 7;
+    cards = new Card[7];
+
+    for (int x = 0; x < 7; x++) {
+        int index = 52 - card_deck.get_n_cards();
+        cards[x] = card_deck.get_card(index);
+        card_deck.reduce_n_cards_deck();
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: get_card_hand
+ ** Description: Gives you the value of a card in the cards variable in the Hand class.
+ ** Parameters: int index
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: Returns the value of a card in the cards variable.
+**************************************************************************************************************/
+Card Hand::get_card_hand(int index) {
+    return cards[index];
+}
+
+/**************************************************************************************************************
+ ** Function: get_cards
+ ** Description: Gives you the cards variable in the Hand class.
+ ** Parameters: None
+ ** Pre-Conditions: None
+ ** Post-Conditions: Returns the cards variable.
+**************************************************************************************************************/
+Card* Hand::get_cards() {
+    return cards;
+}
+
+/**************************************************************************************************************
+ ** Function: get_n_cards_hand
+ ** Description: Gives you the value of n_cards variable in the Hand class.
+ ** Parameters: None
+ ** Pre-Conditions: None
+ ** Post-Conditions: Returns the value of the n_cards variable.
+**************************************************************************************************************/
+int Hand::get_n_cards_hand() {
+    return n_cards;
+}
+
+/**************************************************************************************************************
+ ** Function: add_cards
+ ** Description: Adds a card to the player's hand.
+ ** Parameters: Deck& card_deck
+ ** Pre-Conditions: 1 Deck&
+ ** Post-Conditions: A card is added to the player's hand.
+**************************************************************************************************************/
+void Hand::add_cards(Deck& card_deck) {
+    Card* old_cards = cards;
+    cards = new Card[n_cards + 1];
+
+    for (int x = 0; x < n_cards; x++)
+        cards[x] = old_cards[x];
+    
+    int index = 52 - card_deck.get_n_cards();
+    cards[n_cards] = card_deck.get_card(index);
+    card_deck.reduce_n_cards_deck();
+    n_cards++;
+    
+    delete [] old_cards;
+}
+
+/**************************************************************************************************************
+ ** Function: remove_cards
+ ** Description: Removes a card from the player's hand.
+ ** Parameters: int n, Deck& card_deck
+ ** Pre-Conditions: 1 int and 1 Deck&.
+ ** Post-Conditions: A card is removed from the player's hand.
+**************************************************************************************************************/
+void Hand::remove_cards(int n, Deck& card_deck) {
+    Card* old_cards = cards;
+    cards = new Card[n_cards - 1];
+    n_cards--;
+
+    for (int x = 0; x < n; x++)
+        cards[x] = old_cards[x];
+    
+    for (int x = n; x < n_cards; x++)
+        cards[x] = old_cards[x + 1];
+    
+    delete [] old_cards;
+}
+prog_player.cpp0000660002636200531540000000610313650474232013336 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+#include "./prog_card.h"
+#include "./prog_deck.h"
+#include "./prog_hand.h"
+#include "./prog_player.h"
+#include "./prog_game.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Player
+ ** Description: Initializes objects of Player class.
+ ** Parameters: string player_name, Deck& cards
+ ** Pre-Conditions: 1 string and 1 Deck&
+ ** Post-Conditions: Initializes the hand and name variables in the Player class.
+**************************************************************************************************************/
+Player::Player(string player_name, Deck& cards) {
+    hand = Hand(cards);
+    name = player_name;
+}
+
+/**************************************************************************************************************
+ ** Function: get_hand
+ ** Description: Gives you the value of the hand variable in the Player class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the hand variable.
+**************************************************************************************************************/
+Hand Player::get_hand() {
+    return hand;
+}
+
+/**************************************************************************************************************
+ ** Function: get_name
+ ** Description: Gives you the value of the name variable in the Player class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the name variable.
+**************************************************************************************************************/
+string Player::get_name() {
+    return name;
+}
+
+/**************************************************************************************************************
+ ** Function: set_hand
+ ** Description: Adds or removes a card from the player's hand.
+ ** Parameters: int n, int index, Deck& cards
+ ** Pre-Conditions: 2 ints and 1 Deck&.
+ ** Post-Conditions: A card is added or removed from the player's hand.
+**************************************************************************************************************/
+void Player::set_hand(int n, int index, Deck& cards) {
+    if (n == 1)
+        hand.add_cards(cards);
+    else if (n == -1)
+        hand.remove_cards(index, cards);
+}
+
+/**************************************************************************************************************
+ ** Function: print_hand
+ ** Description: Prints the value of the cards in the player's hand.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The cards in the player's hand is printed.
+**************************************************************************************************************/
+void Player::print_hand() {
+    for (int x = 0; x < hand.get_n_cards_hand(); x++) {
+        Card current_card = hand.get_card_hand(x);
+        cout << x + 1 << ". " << current_card.convert_rank(current_card.get_rank()) << " of " << current_card.convert_suit(current_card.get_suit()) <<endl;
+    }
+
+    cout <<endl;
+}prog_game.cpp0000660002636200531540000002613213650475527012767 0ustar  lichelupg11506#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+#include "./prog_card.h"
+#include "./prog_deck.h"
+#include "./prog_hand.h"
+#include "./prog_player.h"
+#include "./prog_game.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Game
+ ** Description: Initializes objects of Game class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Initializes the cards and players variables in the Game class.
+**************************************************************************************************************/
+Game::Game() {
+    players[0] = Player("Player", cards);
+    players[1] = Player("Computer", cards);
+
+    cards.set_top_card(cards.get_card(14));
+    cards.reduce_n_cards_deck();
+}
+
+/**************************************************************************************************************
+ ** Function: ~Game
+ ** Description: Deletes objects of Game class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Deletes Game class objects.
+**************************************************************************************************************/
+Game::~Game() {
+    delete [] players[0].get_hand().get_cards();
+    delete [] players[1].get_hand().get_cards(); 
+}
+
+/**************************************************************************************************************
+ ** Function: get_player
+ ** Description: Gives you the value of a player in the players variable in the Game class.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: Returns a player from the players variable.
+**************************************************************************************************************/
+Player Game::get_player(int n) {
+    return players[n];
+}
+
+/**************************************************************************************************************
+ ** Function: playable
+ ** Description: Tells you if the player has any options left.
+ ** Parameters: int n
+ ** Pre-Conditions: 1 int.
+ ** Post-Conditions: Returns a bool indicating whether or not the player can play or draw a card.
+**************************************************************************************************************/
+bool Game::playable(int n) {
+    for (int x = 0; x < players[n].get_hand().get_n_cards_hand(); x++)
+        if (players[n].get_hand().get_card_hand(x).get_rank() == cards.get_top_card().get_rank() || 
+            players[n].get_hand().get_card_hand(x).get_suit() == cards.get_top_card().get_suit() ||
+            players[n].get_hand().get_card_hand(x).get_rank() == 7)
+            return true;
+    
+    if (cards.get_n_cards() == 0)
+        return false;
+    
+    return true;
+}
+
+/**************************************************************************************************************
+ ** Function: get_int
+ ** Description: Tells you if the input is an int.
+ ** Parameters: string message
+ ** Pre-Conditions: 1 string
+ ** Post-Conditions: Returns the converted string input as an int.
+**************************************************************************************************************/
+int Game::get_int(string message) {
+    bool valid = false;
+    string choice = "";
+
+    while (!valid) {
+        valid = true;
+        getline(cin, choice);
+
+        for (int x = 0; x < choice.length(); x++)
+            if (choice[x] < '0' || choice[x] > '9')
+                valid = false;
+
+        if (!valid)
+            cout << "Error: ints only. Try again.\n\n" << message;
+    }
+
+    return stoi(choice);
+}
+
+/**************************************************************************************************************
+ ** Function: works
+ ** Description: Tells you if the chosen card can be played.
+ ** Parameters: int n, int player
+ ** Pre-Conditions: 2 ints.
+ ** Post-Conditions: Returns a bool indicating whether or not the chosen card can be played.
+**************************************************************************************************************/
+bool Game::works(int n, int player) {
+    if ((players[player].get_hand().get_card_hand(n).get_rank() == cards.get_top_card().get_rank()) ||
+       (players[player].get_hand().get_card_hand(n).get_suit() == cards.get_top_card().get_suit()) ||
+       (players[player].get_hand().get_card_hand(n).get_rank() == 7))
+        return true;
+    
+    return false;
+}
+
+/**************************************************************************************************************
+ ** Function: valid_choice
+ ** Description: The player chooses to play or draw a card.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns an int representing the player's choice of action.
+**************************************************************************************************************/
+int Game::valid_choice() {
+    bool valid = false;
+    int choice = 0;
+
+    while (!valid) {
+        if (cards.get_n_cards() > 0) {
+            cout << "Enter the card you want to set down or enter 0 to draw a card: ";
+            choice = get_int("Enter the card you want to set down or enter 0 to draw a card: ");
+        } else if (cards.get_n_cards() == 0) {
+            cout << "Enter the card you want to set down (there are no more cards left in the deck): ";
+            choice = get_int("Enter the card you want to set down (there are no more cards left in the deck): ");
+        }
+
+        if (cards.get_n_cards() > 0 && choice == 0)
+            valid = true;
+        else if (choice >= 1 && choice <= players[0].get_hand().get_n_cards_hand())
+            valid = works(choice - 1, 0);
+
+        if (!valid)
+            cout << "Error: invalid choice. Try again.\n" <<endl;
+    }
+
+    return choice;
+}
+
+/**************************************************************************************************************
+ ** Function: wold_card
+ ** Description: The player chooses the suit they want for the 8 card.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the new suit value for the 8 card.
+**************************************************************************************************************/
+int Game::wild_card() {
+    int new_suit = -1;
+
+    while (new_suit < 0 || new_suit > 3) {
+        cout << "Pick a suit (0-clubs, 1-diamonds, 2-hearts, 3-spades): ";
+        
+        new_suit = get_int("Pick a suit (0-clubs, 1-diamonds, 2-hearts, 3-spades): ");
+
+        if (!(new_suit >= 0 && new_suit <= 3))
+            cout << "Error: invalid input. Try again.\n" <<endl;
+    }
+
+    return new_suit;
+}
+
+/**************************************************************************************************************
+ ** Function: player_turn
+ ** Description: The user's turn.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The user makes a choice of action.
+**************************************************************************************************************/
+void Game::player_turn() {
+    bool valid = false;
+
+    while (!valid && playable(0)) {
+        cout << "\nTop card: " << cards.get_top_card().convert_rank(cards.get_top_card().get_rank()) << " " << cards.get_top_card().convert_suit(cards.get_top_card().get_suit()) <<endl;
+        cout << "Your cards: " <<endl;
+        players[0].print_hand();
+
+        int choice = valid_choice();
+
+        if (choice == 0) {
+            players[0].set_hand(1, 0, cards);
+        } else {
+            cards.set_top_card(players[0].get_hand().get_card_hand(choice - 1));
+
+            if (players[0].get_hand().get_card_hand(choice - 1).get_rank() == 7 && players[0].get_hand().get_n_cards_hand() > 1) 
+                cards.set_top_card_suit(wild_card());
+
+            players[0].set_hand(-1, choice - 1, cards);
+            valid = true;
+        }
+    } 
+}
+
+/**************************************************************************************************************
+ ** Function: computer_turn
+ ** Description: The computer's turn.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The computer makes a choice of action.
+**************************************************************************************************************/
+void Game::computer_turn() {
+    bool add = true;
+
+    srand(time(NULL));
+
+    while (add && playable(1)) {
+        for (int x = 0; x < players[1].get_hand().get_n_cards_hand(); x++)
+            if (works(x, 1)) {
+                cards.set_top_card(players[1].get_hand().get_card_hand(x));
+
+                if (players[1].get_hand().get_card_hand(x).get_rank() == 7)
+                    cards.set_top_card_suit(rand() % 4);
+                
+                players[1].set_hand(-1, x, cards);              
+                add = false;
+                break;
+            }
+        
+        if (add)
+            players[1].set_hand(1, 0, cards);
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: win
+ ** Description: Tells you if any of the players won.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns a bool indicating if any of the players won.
+**************************************************************************************************************/
+bool Game::win() {
+    if (players[0].get_hand().get_n_cards_hand() == 0) {
+        cout << "\n" << players[0].get_name() << " ran out of cards, " << players[0].get_name() << " wins!" <<endl;
+    } else if (players[1].get_hand().get_n_cards_hand() == 0) {
+        cout << "\n" << players[1].get_name() << " ran out of cards, " << players[1].get_name() << " wins!" <<endl;
+    } else if (!playable(0) || !playable(1)) {
+        cout << "\nThere are no more cards left in the deck and both players are unable to play their cards." <<endl;
+        cout << players[0].get_name() << " has " << players[0].get_hand().get_n_cards_hand() << " card(s) left." <<endl;
+        cout << players[1].get_name() << " has " << players[1].get_hand().get_n_cards_hand() << " card(s) left." <<endl;
+
+        if (players[0].get_hand().get_n_cards_hand() < players[1].get_hand().get_n_cards_hand())
+            cout << players[0].get_name() << " wins!" <<endl;
+        else if (players[0].get_hand().get_n_cards_hand() > players[1].get_hand().get_n_cards_hand())
+            cout << players[1].get_name() << " wins!" <<endl;
+    } else {
+        return false;
+    }
+    
+    return true;
+}
+
+/**************************************************************************************************************
+ ** Function: end_game
+ ** Description: The user chooses whether or not they want to end or continue playing the game.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns an int representing their decision.
+**************************************************************************************************************/
+int Game::end_game() {
+    int game_over = -1;
+    
+    while (game_over != 0 && game_over != 1) {
+        cout << "\nDo you want to play again (0-yes, 1-no)? ";
+        
+        game_over = get_int("Do you want to play again (0-yes, 1-no)? ");
+        
+        if (game_over != 0 && game_over != 1)
+            cout << "Error: invalid input. Try again." <<endl;    
+    }
+
+    return game_over;
+}
+crazyeights.cpp0000660002636200531540000000170613650463511013351 0ustar  lichelupg11506/******************************************************
+** Program: crazyeights.cpp
+** Author: Chelsea Li
+** Date: 4/26/20
+** Description: Crazy Eights!
+** Input: ints
+** Output: Simulation of the game of Crazy Eights!
+******************************************************/
+
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+#include "./prog_card.h"
+#include "./prog_deck.h"
+#include "./prog_hand.h"
+#include "./prog_player.h"
+#include "./prog_game.h"
+
+using namespace std;
+
+int main() {
+    int game_over = 0;
+
+    while (game_over == 0) {
+        int turn = 0, done = 0;
+        Game game;
+
+        while (!game.win()) { //Alternating between players
+            if (turn % 2 == 0)
+                game.player_turn();
+            else if (turn % 2 != 0)
+                game.computer_turn();
+            
+            turn++;
+        }
+
+        game_over = game.end_game(); //User decides if they want to end the game
+    }
+
+    return 0;
+}Makefile0000660002636200531540000000111013650421770011737 0ustar  lichelupg11506CC = g++ -std=c++11
+exe_file = assign2_exe
+$(exe_file): prog_card.o prog_deck.o prog_hand.o prog_player.o prog_game.o crazyeights.o
+	$(CC) prog_card.o prog_deck.o prog_hand.o prog_player.o prog_game.o crazyeights.o -o $(exe_file)
+prog_card.o: prog_card.cpp
+	$(CC) -c prog_card.cpp
+prog_deck.o: prog_deck.cpp
+	$(CC) -c prog_deck.cpp
+prog_hand.o: prog_hand.cpp
+	$(CC) -c prog_hand.cpp
+prog_player.o: prog_player.cpp
+	$(CC) -c prog_player.cpp
+prog_game.o: prog_game.cpp
+	$(CC) -c prog_game.cpp
+crazyeights.o: crazyeights.cpp
+	$(CC) -c crazyeights.cpp
+clean:
+	rm -f *.out *.o $(exe_file)
