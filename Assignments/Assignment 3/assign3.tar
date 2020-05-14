@@ -1,0 +1,856 @@
+animal.h0000660002636200531540000000120713654740504011723 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+class Animal {
+    protected:
+        string species;
+        int age;
+        float cost;
+        int babies;
+        float food_cost;
+        float revenue;
+        int num_bought;
+    
+    public:
+        Animal() {};
+        Animal(const Animal&);
+        Animal& operator= (const Animal&);
+        string get_species();
+        int get_age();
+        float get_cost();
+        int get_babies();
+        float get_food_cost();
+        float get_revenue();
+        void set_age();
+        void set_food_cost(int n);
+        void set_revenue();
+};
+sea_lion.h0000660002636200531540000000025013654741763012260 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+class Sea_lion : public Animal {
+    public:
+        Sea_lion(bool);
+};tiger.h0000660002636200531540000000024213654740764011602 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+class Tiger : public Animal {
+    public:
+        Tiger(bool);
+};bear.h0000660002636200531540000000024013654741064011371 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+class Bear : public Animal {
+    public:
+        Bear(bool);
+};zoo.h0000660002636200531540000000154113655071334011271 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+class Zoo {
+    private:
+        Animal* animals;
+        int num_animals;
+        float balance;
+        float base_food;
+        string feed_type;
+        string animal_species;
+        int add_sub;
+    
+    public:
+        Zoo();
+        Zoo(const Zoo&);
+        Zoo& operator= (const Zoo&);
+        ~Zoo();
+        float get_balance();
+        int get_add_sub();
+        void set_balance();
+        void set_feed_type();
+        int is_int();
+        int animal_amount();
+        void animal_choice();
+        void monthly_action();
+        void add_animals(bool, Zoo&);
+        void remove_animal(int, Zoo&);
+        void sick_animal(int, Zoo&);
+        bool great_attendance();
+        void random_event(Zoo&);
+        void print_animals();
+        int end();
+};animal.cpp0000660002636200531540000001421713655111076012260 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include "./animal.h"
+#include "./sea_lion.h"
+#include "./tiger.h"
+#include "./bear.h"
+#include "./zoo.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Animal
+ ** Description: Copy constructor for the Animal class.
+ ** Parameters: const Animal& old_animal
+ ** Pre-Conditions: 1 const Animal&
+ ** Post-Conditions: Copies the member variables of one Animal object to another.
+**************************************************************************************************************/
+Animal::Animal(const Animal& old_animal) {
+    species = old_animal.species;
+    age = old_animal.age;
+    cost = old_animal.cost;
+    babies = old_animal.babies;
+    food_cost = old_animal.food_cost;
+    revenue = old_animal.revenue;
+}
+
+/**************************************************************************************************************
+ ** Function: operator=
+ ** Description: Assignment operator for the Animal class.
+ ** Parameters: const Animal& old_animal
+ ** Pre-Conditions: 1 const Animal&
+ ** Post-Conditions: Assigns the member variables of one Animal object to another.
+**************************************************************************************************************/
+Animal& Animal::operator= (const Animal& old_animal) {
+    species = old_animal.species;
+    age = old_animal.age;
+    cost = old_animal.cost;
+    babies = old_animal.babies;
+    food_cost = old_animal.food_cost;
+    revenue = old_animal.revenue;
+    return *this;
+}
+
+/**************************************************************************************************************
+ ** Function: get_species
+ ** Description: Gives you the value of the species variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the species variable.
+**************************************************************************************************************/
+string Animal::get_species() {
+    return species;
+}
+
+/**************************************************************************************************************
+ ** Function: get_age
+ ** Description: Gives you the value of the age variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the age variable.
+**************************************************************************************************************/
+int Animal::get_age() {
+    return age;
+}
+
+/**************************************************************************************************************
+ ** Function: get_cost
+ ** Description: Gives you the value of the cost variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the cost variable.
+**************************************************************************************************************/
+float Animal::get_cost() {
+    return cost;
+}
+
+/**************************************************************************************************************
+ ** Function: get_babies
+ ** Description: Gives you the value of the babies variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the babies variable.
+**************************************************************************************************************/
+int Animal::get_babies() {
+    return babies;
+}
+
+/**************************************************************************************************************
+ ** Function: get_food_cost
+ ** Description: Gives you the value of the food_cost variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the food_cost variable.
+**************************************************************************************************************/
+float Animal::get_food_cost() {
+    return food_cost;
+}
+
+/**************************************************************************************************************
+ ** Function: get_revenue
+ ** Description: Gives you the value of the revenue variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the revenue variable.
+**************************************************************************************************************/
+float Animal::get_revenue() {
+    return revenue;
+}
+
+/**************************************************************************************************************
+ ** Function: set_age
+ ** Description: Changes the value of the age variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The value of the age variable is changed to a new value.
+**************************************************************************************************************/
+void Animal::set_age() {
+    age++;
+}
+
+/**************************************************************************************************************
+ ** Function: set_food_cost
+ ** Description: Changes the value of the food_cost variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The value of the food_cost variable is changed to a new value.
+**************************************************************************************************************/
+void Animal::set_food_cost(int base_food) {
+    if (species == "sea lion")
+        food_cost = base_food;
+    else if (species == "tiger")
+        food_cost = 5 * base_food;
+    else if (species == "black bear")
+        food_cost = 3 * base_food;
+}
+
+/**************************************************************************************************************
+ ** Function: set_revenue
+ ** Description: Changes the value of the revenue variable in the Animal class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The value of the revenue variable is changed to a new value.
+**************************************************************************************************************/
+void Animal::set_revenue() {
+    revenue /= 2;
+}sea_lion.cpp0000660002636200531540000000153113655111155012601 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include "./animal.h"
+#include "./sea_lion.h"
+#include "./tiger.h"
+#include "./bear.h"
+#include "./zoo.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Sea_lion
+ ** Description: Default constructor for the Sea_lion class.
+ ** Parameters: bool bought
+ ** Pre-Conditions: 1 bool.
+ ** Post-Conditions: Initializes the member variables in the Sea_lion class.
+**************************************************************************************************************/
+Sea_lion::Sea_lion(bool bought) {
+    species = "sea lion";
+
+    if (bought) {
+        age = 36;
+        revenue = 120;
+    } else {
+        age = 0;
+        revenue = 240;
+    }
+
+    cost = 800;
+    babies = 1;
+}tiger.cpp0000660002636200531540000000151713655111206012123 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include "./animal.h"
+#include "./sea_lion.h"
+#include "./tiger.h"
+#include "./bear.h"
+#include "./zoo.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Tiger
+ ** Description: Default constructor for the Tiger class.
+ ** Parameters: bool bought
+ ** Pre-Conditions: 1 bool.
+ ** Post-Conditions: Initializes the member variables in the Tiger class.
+**************************************************************************************************************/
+Tiger::Tiger(bool bought) {
+    species = "tiger";
+    
+    if (bought) {
+        age = 36;
+        revenue = 1500;
+    } else {
+        age = 0;
+        revenue = 3000;
+    }
+
+    cost = 15000;
+    babies = 3;
+}bear.cpp0000660002636200531540000000151113655111230011711 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include "./animal.h"
+#include "./sea_lion.h"
+#include "./tiger.h"
+#include "./bear.h"
+#include "./zoo.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Bear
+ ** Description: Default constructor for the Bear class.
+ ** Parameters: bool bought
+ ** Pre-Conditions: 1 bool.
+ ** Post-Conditions: Initializes the member variables in the Bear class.
+**************************************************************************************************************/
+Bear::Bear(bool bought) {
+    species = "black bear";
+
+    if (bought) {
+        age = 36;
+        revenue = 600;
+    } else {
+        age = 0;
+        revenue = 1200;
+    }
+
+    cost = 6000;
+    babies = 2;
+}zoo.cpp0000660002636200531540000004241113655111411011614 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include "./animal.h"
+#include "./sea_lion.h"
+#include "./tiger.h"
+#include "./bear.h"
+#include "./zoo.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Zoo
+ ** Description: Default constructor for the Zoo class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Initializes the member variables in the Zoo class.
+**************************************************************************************************************/
+Zoo::Zoo() {
+    animals = new Animal[0];
+    num_animals = 0;
+    balance = 100000;
+    base_food = 80;
+    feed_type = "";
+    animal_species = "";
+    add_sub = 0;
+}
+
+/**************************************************************************************************************
+ ** Function: Zoo
+ ** Description: Copy constructor for the Zoo class.
+ ** Parameters: const Zoo& old_zoo
+ ** Pre-Conditions: 1 const Zoo&
+ ** Post-Conditions: Copies the member variables of one Zoo object to another.
+**************************************************************************************************************/
+Zoo::Zoo(const Zoo& old_zoo) {
+    num_animals = old_zoo.num_animals;
+    animals = new Animal[num_animals + old_zoo.add_sub];
+    
+    if (old_zoo.add_sub == -1)
+        for (int x = 0; x < num_animals - 1; x++)
+            animals[x] = old_zoo.animals[x];
+    else
+        for (int x = 0; x < num_animals; x++)
+            animals[x] = old_zoo.animals[x];
+    
+    num_animals += old_zoo.add_sub;
+    balance = old_zoo.balance;
+    base_food = old_zoo.base_food;
+    feed_type = old_zoo.feed_type;
+    animal_species = old_zoo.animal_species;
+    add_sub = old_zoo.add_sub;
+}
+
+/**************************************************************************************************************
+ ** Function: operator=
+ ** Description: Assignment operator for the Zoo class.
+ ** Parameters: const Zoo& old_zoo
+ ** Pre-Conditions: 1 const Zoo&
+ ** Post-Conditions: Assigns the member variables of one Zoo object to another.
+**************************************************************************************************************/
+Zoo& Zoo::operator= (const Zoo& old_zoo) {
+    if (this != &old_zoo)
+        delete [] animals;
+        
+    num_animals = old_zoo.num_animals;
+    animals = new Animal[num_animals];
+    
+    for (int x = 0; x < num_animals; x++)
+        animals[x] = old_zoo.animals[x];
+    
+    balance = old_zoo.balance;
+    base_food = old_zoo.base_food;
+    feed_type = old_zoo.feed_type;
+    animal_species = old_zoo.animal_species;
+    add_sub = old_zoo.add_sub;
+    
+    return *this;
+}
+
+/**************************************************************************************************************
+ ** Function: ~Zoo
+ ** Description: Destructor for the Zoo class.
+ ** Parameters: None
+ ** Pre-Conditions: None
+ ** Post-Conditions: Deletes all dynamically allocated memory in the Zoo class.
+**************************************************************************************************************/
+Zoo::~Zoo() {
+    delete [] animals;
+}
+
+/**************************************************************************************************************
+ ** Function: get_balance
+ ** Description: Gives you the value of the balance variable in the Zoo class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the balance variable.
+**************************************************************************************************************/
+float Zoo::get_balance() {
+    return balance;
+}
+
+/**************************************************************************************************************
+ ** Function: get_add_sub
+ ** Description: Gives you the value of the add_sub variable in the Zoo class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the add_sub variable.
+**************************************************************************************************************/
+int Zoo::get_add_sub() {
+    return add_sub;
+}
+
+/**************************************************************************************************************
+ ** Function: set_balance
+ ** Description: Changes the value of the balance variable in the Zoo class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The value of the balance variable is changed to a new value.
+**************************************************************************************************************/
+void Zoo::set_balance() {
+    base_food *= ((float) (rand() % 5)) / 10.0 + 0.8;
+    
+    for (int x = 0; x < num_animals; x++) {
+        balance += animals[x].get_revenue();
+        
+        if (feed_type == "Regular")
+            balance -= animals[x].get_food_cost();
+        else if (feed_type == "Premium")
+            balance -= animals[x].get_food_cost() * 2;
+        else if (feed_type == "Cheap")
+            balance -= animals[x].get_food_cost() / 2;
+
+        animals[x].set_age();
+
+        if (animals[x].get_age() == 36)
+            animals[x].set_revenue();
+
+        animals[x].set_food_cost(base_food);
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: set_feed_type
+ ** Description: Changes the value of the feed_type variable in the Zoo class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The value of the feed_type variable is changed to a new value.
+**************************************************************************************************************/
+void Zoo::set_feed_type() {
+    int feed = 0;
+
+    while (feed < 1 || feed > 3) {
+        cout << "What kind of feed do you want (1-regular, 2-premium, 3-cheap)? ";
+        feed = is_int();
+
+        if (feed < 1 || feed > 3)
+            cout << "Error: invalid input.\n" <<endl;
+    }
+
+    if (feed == 1) {
+        feed_type = "Regular";
+    } else if (feed == 2) {
+        feed_type = "Premium";
+    } else if (feed == 3) {
+        feed_type = "Cheap";
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: is_int
+ ** Description: Tells you if the input is an int.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns a boolean indicating if the input is an int.
+**************************************************************************************************************/
+int Zoo::is_int() {
+    string str = "";
+
+    getline(cin, str);
+
+    for (int x = 0; x < str.size(); x++)
+        if (str[x] < '0' || str[x] > '9')
+            return -1;
+    
+    return stoi(str);
+}
+/**************************************************************************************************************
+ ** Function: animal_amount
+ ** Description: User decides how many animals they want to buy.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns an int representing the number of animals they want to buy.
+**************************************************************************************************************/
+int Zoo::animal_amount() {
+    int num = -1;
+
+    while (num < 0 || num > 2) {
+        cout << "How many do you want to buy (max. 2): ";
+        num = is_int();
+
+        if (num < 0 || num > 2)
+            cout << "Error: invalid input.\n" <<endl;
+    }
+
+    return num;
+}
+
+/**************************************************************************************************************
+ ** Function: animal_choice
+ ** Description: User chooses what kind of animal they want to buy
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: User enters an int representing what animal they want to buy.
+**************************************************************************************************************/
+void Zoo::animal_choice() {
+    int choice = 0;
+
+    while (choice < 1 || choice > 3) {
+        cout << "Enter 1 to buy a sea lion, 2 to buy a tiger, or 3 to buy a black bear: ";
+        choice = is_int();
+
+        if (choice == 1)
+            animal_species = "sea lion";
+        else if (choice == 2)
+            animal_species = "tiger";
+        else if (choice == 3)
+            animal_species = "black bear";
+        else
+            cout << "Error: invalid input.\n" <<endl;
+    }
+
+    add_sub = animal_amount();
+}
+
+/**************************************************************************************************************
+ ** Function: monthly_action
+ ** Description: User decides if they want to buy some animals or go to the next month.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: User enters an int representing what they want to do.
+**************************************************************************************************************/
+void Zoo::monthly_action() {
+    int choice = 0;
+
+    while (choice != 2 || (choice == 1 && num_animals < 2)) {
+        if (add_sub == 0)
+            cout << "\nEnter 1 to buy some animals or 2 to go to the next month: ";
+        else if (add_sub == 1)
+            cout << "\nEnter 1 to add another " << animal_species << " or 2 to go to the next month: ";
+        else
+            cout << "\nEnter 2 to go to the next month: ";
+
+        choice = is_int();
+
+        if (choice == 1 && add_sub == 0)
+            animal_choice();
+        else if (choice == 1 && add_sub == 1)
+            add_sub++;
+        else if ((choice < 1 || choice > 2) || (choice == 1 && add_sub == 2))
+            cout << "Error: invalid input." <<endl;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: add_animals
+ ** Description: Adding animals to the animals array in the Zoo class.
+ ** Parameters: bool bought, Zoo& zoo
+ ** Pre-Conditions: 1 boo and 1 Zoo&.
+ ** Post-Conditions: New animals are added to the animals array in the Zoo class.
+**************************************************************************************************************/
+void Zoo::add_animals(bool bought, Zoo& zoo) {
+    Zoo updated_zoo = zoo;
+    zoo = updated_zoo;
+
+    for (int x = add_sub; x > 0; x--) {
+        if (animal_species == "sea lion") {
+            Sea_lion new_sea_lion(bought);
+            animals[num_animals - x] = new_sea_lion;
+        } else if (animal_species == "tiger") {
+            Tiger new_tiger(bought);
+            animals[num_animals - x] = new_tiger;
+        } else if (animal_species == "black bear") {
+            Bear new_bear(bought);
+            animals[num_animals - x] = new_bear;
+        }
+        
+        animals[num_animals - x].set_food_cost(base_food);
+
+        if (bought)
+            balance -= animals[num_animals - x].get_cost();   
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: remove_animal
+ ** Description: Removing an animal from the animals array in the Zoo class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: An animal is removed from the animals array in the Zoo class.
+**************************************************************************************************************/
+void Zoo::remove_animal(int n, Zoo& zoo) {
+    Animal temp = animals[n];
+    animals[n] = animals[num_animals - 1];
+    animals[num_animals - 1] = temp;
+   
+    Zoo updated_zoo = zoo;
+    zoo = updated_zoo;
+}
+
+/**************************************************************************************************************
+ ** Function: sick_animal
+ ** Description: A randomly chosen animal gets sick.
+ ** Parameters: int rand_animal, Zoo& zoo
+ ** Pre-Conditions: 1 int and 1 Zoo&.
+ ** Post-Conditions: The user pays for the medical bill, but if they can't, the animal will pass away.
+**************************************************************************************************************/
+void Zoo::sick_animal(int rand_animal, Zoo& zoo) {
+    float medical_cost = animals[rand_animal].get_cost() / 2;
+
+    if (animals[rand_animal].get_age() < 36)
+        medical_cost *= 2;
+
+    if (balance >= medical_cost) {
+        balance -= medical_cost;
+        cout << "\nOne of your animals got sick, but you were able to afford the medical care for it and now its better." <<endl;
+    } else {
+        add_sub = -1;
+        remove_animal(rand_animal, zoo);
+        cout << "\nOne of your animals got sick and you couldn't afford the medical bill so it passed away." <<endl;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: great_attendance
+ ** Description: The user gets a random bonus between $150-400 for having great attendence.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: A bool is returned indicating if there are sea lions in the zoo.
+**************************************************************************************************************/
+bool Zoo::great_attendance() {
+    int total_sea_lions = 0, bonus = rand() % 251 + 150;
+
+    for (int x = 0; x < num_animals; x++)
+        if (animals[x].get_species() == "sea lion")
+            total_sea_lions++;
+    
+    if (total_sea_lions == 0) {
+        return false;
+    } else {
+        balance += total_sea_lions * bonus;
+        cout << "\nYou had a great attendance this month and got a $" << bonus << " bonus." <<endl;
+        return true;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: random_event
+ ** Description: A random event is generated.
+ ** Parameters: Zoo& zoo
+ ** Pre-Conditions: 1 Zoo&.
+ ** Post-Conditions: A random event is generated.
+**************************************************************************************************************/
+void Zoo::random_event(Zoo& zoo) {
+    bool valid = false;
+    int rand_animal = 0;
+
+    if (num_animals > 0)
+        rand_animal = rand() % num_animals;
+    
+    while (!valid) {
+        int event = rand() % 10;
+        valid = true;
+
+        if (event == 0 || event == 1 || num_animals == 0) {
+            cout << "\nNo special event occured" <<endl;
+        } else if ((event == 2 || event == 3) && (num_animals > 0)) {
+            animal_species = animals[rand_animal].get_species();
+            add_sub = animals[rand_animal].get_babies();
+            add_animals(false, zoo);
+            cout << "\nA " << animals[rand_animal].get_species() << " gave birth to " << animals[rand_animal].get_babies() << " kid(s)." <<endl;
+        } else if (event == 4 || event == 5) {
+            valid = great_attendance();
+        } else if (((event <= 7 && feed_type == "Regular") || (event == 6 && feed_type == "Premium") || (event <= 9 && feed_type == "Cheap")) && (num_animals > 0)) {
+            sick_animal(rand_animal, zoo);
+        } else {
+            valid = false;
+        }
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: print_animals
+ ** Description: Prints the number of animals the user has.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The number of adult and baby animals for each species is printed.
+**************************************************************************************************************/
+void Zoo::print_animals() {
+    if (num_animals == 0) {
+        cout << "You currently don't have any animals in your zoo." <<endl;
+    } else {
+        int adult_sea_lions = 0, baby_sea_lions = 0, adult_tigers = 0, baby_tigers = 0, adult_bears = 0, baby_bears = 0;
+
+        for (int x = 0; x < num_animals; x++)
+            if (animals[x].get_species() == "sea lion" && animals[x].get_age() >= 36)
+                adult_sea_lions++;
+            else if (animals[x].get_species() == "sea lion" && animals[x].get_age() < 36)
+                baby_sea_lions++;
+            else if (animals[x].get_species() == "tiger" && animals[x].get_age() >= 36)
+                adult_tigers++;
+            else if (animals[x].get_species() == "tiger" && animals[x].get_age() < 36)
+                baby_tigers++;
+            else if (animals[x].get_species() == "black bear" && animals[x].get_age() >= 36)
+                adult_bears++;
+            else if (animals[x].get_species() == "black_bear" && animals[x].get_age() < 36)
+                baby_bears++;
+            
+        cout << "You have " << adult_sea_lions << " adult sea lion(s), " << baby_sea_lions << " baby sea lion(s), " << adult_tigers 
+             << " adult tiger(s), " << baby_tigers << " baby tiger(s), " << adult_bears << " adult black bears, and " << baby_bears << " baby black bears." <<endl;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: end
+ ** Description: User decides if they want to keep playing.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: An int is returned indicating whether or not the user want to keep playing.
+**************************************************************************************************************/
+int Zoo::end() {
+    int done = 0;
+
+    while (done < 1 || done > 2) {
+        cout << "\nDo you want to keep playing? (1-yes, 2-no) ";
+        done = is_int();
+
+        if (done < 1 || done > 2)
+            cout << "Error: invalid input." <<endl;
+    }
+
+    if (done == 1) {
+        animal_species = "";
+        add_sub = 0;
+    }
+    
+    return done;
+}zoo_tycoon.cpp0000640002636200531540000000216413655057411013217 0ustar  lichelupg11506/******************************************************
+** Program: zoo_tycoon.cpp
+** Author: Chelsea Li
+** Date: 5/10/20
+** Description: Zoo tycoon!
+** Input: ints
+** Output: Simulation of a zoo tycoon game.
+******************************************************/
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <ctime>
+#include "./animal.h"
+#include "./sea_lion.h"
+#include "./tiger.h"
+#include "./bear.h"
+#include "./zoo.h"
+
+using namespace std;
+
+int main() {
+    srand(time(NULL));
+    int done = 1;
+    Zoo zoo;
+
+    cout << "Welcome to Zoo Tycoon!" <<endl;
+
+    while (zoo.get_balance() > 0 && done == 1) {
+        cout << "\nYour current balance is: $" << zoo.get_balance() <<endl;
+        zoo.print_animals();
+
+        zoo.monthly_action();
+        zoo.set_feed_type();
+        
+        if (zoo.get_add_sub() > 0) 
+            zoo.add_animals(true, zoo);
+        
+        zoo.random_event(zoo);
+        zoo.set_balance();
+        done = zoo.end();
+    }
+
+    if (zoo.get_balance() <= 0)
+        cout << "Your zoo went bankrupt. Game over :(" <<endl;
+
+    return 0;
+}Makefile0000660002636200531540000000073413654742001011747 0ustar  lichelupg11506CC = g++ -std=c++11
+
+exe_file = assign3_exe
+
+$(exe_file): animal.o sea_lion.o tiger.o bear.o zoo.o zoo_tycoon.o
+	$(CC) animal.o sea_lion.o tiger.o bear.o zoo.o zoo_tycoon.o -o $(exe_file)
+animal.o: animal.cpp
+	$(CC) -c animal.cpp
+sea_lion.o: sea_lion.cpp
+	$(CC) -c sea_lion.cpp
+tiger.o: tiger.cpp
+	$(CC) -c tiger.cpp
+bear.o: bear.cpp
+	$(CC) -c bear.cpp
+zoo.o: zoo.cpp
+	$(CC) -c zoo.cpp
+zoo_tycoon.o: zoo_tycoon.cpp
+	$(CC) -c zoo_tycoon.cpp
+clean:
+	rm -f *.out *.o $(exe_file)
