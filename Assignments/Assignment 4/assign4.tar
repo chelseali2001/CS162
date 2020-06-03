@@ -1,0 +1,1401 @@
+Event.h0000660002636200531540000000044713662422143011543 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class Event {
+    public:
+        virtual void percept() = 0;
+        virtual void encounter() = 0;
+};Wumpus.h0000660002636200531540000000060513662422312011754 0ustar  lichelupg11506#include <iostream>
+#include <string> 
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class Wumpus : public Event {
+    public:
+        void percept() { cout << "You smell a terrible stench." <<endl; }
+        void encounter() { cout << "\nYou encountered the Wumpus." <<endl; }
+};Bats.h0000660002636200531540000000065113662422125011350 0ustar  lichelupg11506#include <iostream>
+#include <string> 
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class Bats : public Event {
+    public:
+        void percept() { cout << "You hear wings flapping." <<endl; }
+        void encounter() { cout << "\nYou encountered a room full of bats and they moved you to a new room." <<endl; }
+};Pit.h0000660002636200531540000000056113662422275011221 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class Pit : public Event {
+    public:
+        void percept() { cout << "You feel a breeze." <<endl; }
+        void encounter() { cout << "\nYou fell into a pit." <<endl; }
+
+};Gold.h0000660002636200531540000000057013662422217011346 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class Gold : public Event {
+    public:
+        void percept() { cout << "You see a glimmer nearby." <<endl; }
+        void encounter() { cout << "\nYou found the gold!" <<endl; }
+
+};Room.h0000660002636200531540000000113013662426240011366 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class Room {
+    private:
+        Event* event;
+        string event_type;
+        vector<int> room_pos;
+
+    public:
+        Room();
+        Room(string);
+        ~Room();
+        string get_event_type(vector<int>, int, int, string);
+        vector<int> get_room_pos();
+        string get_event();
+        void set_event_type(string);
+        void set_room_pos(int, int);
+        void room_action(bool);
+};Game.h0000660002636200531540000000212213663026573011333 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class Game {
+    protected:
+        int dimension;
+        vector<vector<Room>> game_board;
+        string debug_mode;
+        int arrows;
+        vector<vector<int>> start_events;
+        vector<int> player_loc;
+        bool got_gold;
+        bool wumpus_dead;
+        vector<int> prev_pos;
+        bool first_move;
+
+    public:
+        Game(int, string);
+        int get_arrows();
+        vector<int> generate_pos();
+        void print_board();
+        bool check_bounds(string);
+        void change_pos(string);
+        void move();
+        void kill_wumpus(int, int);
+        void wake_wumpus();
+        void shot_north();
+        void shot_west();
+        void shot_south();
+        void shot_east();
+        void arrow_shot(string);
+        void shoot_arrow();
+        void check_surroundings();
+        int check_current_room();
+        bool win();
+        void randomize_events();
+        void reset();
+};AI.h0000660002636200531540000000123013662422057010746 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+class AI : public Game {
+    private:
+        vector<vector<int>> safe_rooms;
+        vector<vector<int>> move_options;
+        bool ai_used;
+        
+    public:
+        AI(int, string);
+        bool get_ai_used();
+        void set_ai_used(bool);
+        void find_dead_end();
+        bool find_event(string);
+        void ai_move(vector<float>);
+        void pick_direction();
+        void possible_directions();
+        void decide_action();
+        void play_AI();
+};Other.h0000660002636200531540000000057613663027247011555 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+
+using namespace std;
+
+int getch(void);
+bool is_int(string);
+bool check_comm_line(int, char**);
+bool use_AI();
+void play_game(AI&);
+string play_again(AI&);
+string change_cave(AI&);
+void new_values(int&, string&);Room.cpp0000660002636200531540000001320513662422301011721 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+#include "./Event.h"
+#include "./Wumpus.h"
+#include "./Bats.h"
+#include "./Pit.h"
+#include "./Gold.h"
+#include "./Room.h"
+#include "./Game.h"
+#include "./AI.h"
+#include "./Other.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Room
+ ** Description: Default constructor for the Room class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Initializes the member variables in the Room class.
+**************************************************************************************************************/
+Room::Room() {
+    event_type = " ";
+}
+
+/**************************************************************************************************************
+ ** Function: Room
+ ** Description: Parameterized constructor for the Zoo class.
+ ** Parameters: string type
+ ** Pre-Conditions: 1 string.
+ ** Post-Conditions: Initializes the member variables in the Room class.
+**************************************************************************************************************/
+Room::Room(string type) {
+    event_type = type;
+}
+
+/**************************************************************************************************************
+ ** Function: ~Room
+ ** Description: Destructor for the Room class.
+ ** Parameters: None
+ ** Pre-Conditions: None
+ ** Post-Conditions: Deletes all dynamically allocated memory in the Room class.
+**************************************************************************************************************/
+Room::~Room() {
+    event = NULL; 
+    delete event;
+}
+
+/**************************************************************************************************************
+ ** Function: get_event_type
+ ** Description: Gives you the value of the event_type variable in the Room class.
+ ** Parameters: vector<int> player_loc, int x_pos, int y_pos, string debug_mode
+ ** Pre-Conditions: 1 vector<int>, 2 ints, and 1 string.
+ ** Post-Conditions: Returns the value of the event_type variable depending on the user location and mode.
+**************************************************************************************************************/
+string Room::get_event_type(vector<int> player_loc, int x_pos, int y_pos, string debug_mode) {
+    if (player_loc[0] == x_pos && player_loc[1] == y_pos)
+        return "*";
+    else if (debug_mode == "false")
+        return " ";
+    else if (debug_mode == "true")
+        return event_type;
+}
+
+/**************************************************************************************************************
+ ** Function: get_room_pos
+ ** Description: Gives you the value of the room_pos variable in the Room class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the room_pos variable.
+**************************************************************************************************************/
+vector<int> Room::get_room_pos() {
+    return room_pos;
+}
+
+/**************************************************************************************************************
+ ** Function: get_event
+ ** Description: Gives you the value of the event_type variable in the Room class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the event_type variable.
+**************************************************************************************************************/
+string Room::get_event() {
+    return event_type;
+}
+
+/**************************************************************************************************************
+ ** Function: set_event_type
+ ** Description: Changes the value of the event_type variable in the Room class.
+ ** Parameters: string n
+ ** Pre-Conditions: 1 string.
+ ** Post-Conditions: The value of the event_type variable is changed to a new value.
+**************************************************************************************************************/
+void Room::set_event_type(string n) {
+    event_type = n;
+}
+
+/**************************************************************************************************************
+ ** Function: set_room_pos
+ ** Description: Changes the value of the room_pos variable in the Room class.
+ ** Parameters: int x, int y
+ ** Pre-Conditions: 2 ints.
+ ** Post-Conditions: The value of the room_pos variable is changed to a new value.
+**************************************************************************************************************/
+void Room::set_room_pos(int x, int y) {
+    room_pos.push_back(x);
+    room_pos.push_back(y);
+}
+
+/**************************************************************************************************************
+ ** Function: room_action
+ ** Description: An action is taken if the player is close to or is in a room that has an event.
+ ** Parameters: bool percept
+ ** Pre-Conditions: 1 bool
+ ** Post-Conditions: The percept or encounter functions are called depending on the events around the player.
+**************************************************************************************************************/
+void Room::room_action(bool percept) {
+    Wumpus wumpus;
+    Bats bats;
+    Pit pit;
+    Gold gold;
+    
+    if (event_type == "W") 
+        event = &wumpus;
+    else if (event_type == "B")
+        event = &bats;
+    else if (event_type == "P")
+        event = &pit;
+    else if (event_type == "G")
+        event = &gold;
+
+    if (event_type != " " && event_type != "E")
+        if (percept)
+            event->percept();
+        else 
+            event->encounter();        
+}Game.cpp0000660002636200531540000004301713663030271011664 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+#include "./Event.h"
+#include "./Wumpus.h"
+#include "./Bats.h"
+#include "./Pit.h"
+#include "./Gold.h"
+#include "./Room.h"
+#include "./Game.h"
+#include "./AI.h"
+#include "./Other.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: Game
+ ** Description: Parameterized constructor for the Game class.
+ ** Parameters: int game_dimension, string mode
+ ** Pre-Conditions: 1 int and 1 string.
+ ** Post-Conditions: Initializes the member variables in the Game class.
+**************************************************************************************************************/
+Game::Game(int game_dimension, string mode) {
+    dimension = game_dimension;
+    debug_mode = mode;
+    arrows = 3;
+    got_gold = false;
+    wumpus_dead = false;
+    game_board.assign(dimension, vector<Room>(dimension));
+    
+    string v[7] = {"P", "P", "B", "B", "W", "G", "E"};
+
+    for (int x = 0; x < 7; x++) {
+        vector<int> key = generate_pos();
+        start_events.push_back(key);
+        game_board[key[0]][key[1]] = Room(v[x]);
+    }
+
+    for (int x = 0; x < dimension; x++)
+        for (int i = 0; i < dimension; i++) 
+            game_board[x][i].set_room_pos(x, i);
+
+    player_loc = start_events[6];
+}
+
+/**************************************************************************************************************
+ ** Function: get_arrows
+ ** Description: Gives you the value of the arrows variable in the Game class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the arrows variable.
+**************************************************************************************************************/
+int Game::get_arrows() {
+    return arrows;
+}
+
+/**************************************************************************************************************
+ ** Function: generate_pos
+ ** Description: Generates random positions.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Random positions are generated for the events.
+**************************************************************************************************************/
+vector<int> Game::generate_pos() {
+    bool valid = false;
+    vector<int> key = {rand() % dimension, rand() % dimension};
+    
+    srand(time(NULL));
+    
+    while (!valid) {
+        int total = 0;
+        
+        for (int x = 0; x < start_events.size(); x++)
+            if (start_events[x] == key)
+                total++;
+        
+        if (total == 0)
+            valid = true;
+        else if (total > 0)
+            key = {rand() % dimension, rand() % dimension};
+    }
+    
+     return key;    
+}
+
+/**************************************************************************************************************
+ ** Function: print_board
+ ** Description: Prints out the game.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Prints out the game.
+**************************************************************************************************************/
+void Game::print_board() {
+    cout << "\n" <<endl;
+
+    for (int x = 0; x < dimension; x++) {
+        for (int i = 0; i < dimension; i++)
+            cout << "+---";
+        
+        cout << "+" <<endl;
+
+        for (int i = 0; i < dimension; i++)
+            cout << "|   ";
+        
+        cout << "|" <<endl;
+
+        for (int i = 0; i < dimension; i++)
+            cout << "| " << game_board[x][i].get_event_type(player_loc, x, i, debug_mode) << " ";
+        
+        cout << "|" <<endl; 
+
+        for (int i = 0; i < dimension; i++)
+            cout << "|   ";
+        
+        cout << "|" <<endl;
+    }
+
+    for (int i = 0; i < dimension; i++)
+        cout << "+---";
+    
+    cout << "+" <<endl;
+}
+
+/**************************************************************************************************************
+ ** Function: check_boards
+ ** Description: Tells you if the direction the player wants to move will be in bounds.
+ ** Parameters: string direction
+ ** Pre-Conditions: 1 string.
+ ** Post-Conditions: Returns a bool indicating whether or not direction the player wants to move is in bounds.
+**************************************************************************************************************/
+bool Game::check_bounds(string direction) {
+    if ((direction == "w" && (player_loc[0] - 1 >= 0)) ||
+        (direction == "a" && (player_loc[1] - 1 >= 0)) ||
+        (direction == "s" && (player_loc[0] + 1 < dimension)) ||
+        (direction == "d" && (player_loc[1] + 1 < dimension)) ||
+        direction == " ")
+        return true;
+    
+    return false;
+}
+
+/**************************************************************************************************************
+ ** Function: change_pos
+ ** Description: Changes the location of the player.
+ ** Parameters: string direction
+ ** Pre-Conditions: 1 string.
+ ** Post-Conditions: Changes the player's position.
+**************************************************************************************************************/
+void Game::change_pos(string direction) {
+    first_move = false;
+
+    if (direction == " ")
+        shoot_arrow();
+    else if (direction == "w")
+        player_loc[0] -= 1;
+    else if (direction == "a")
+        player_loc[1] -= 1;
+    else if (direction == "s")
+        player_loc[0] += 1;
+    else if (direction == "d")
+        player_loc[1] += 1;
+    
+    if (direction == " ")
+        cin.ignore();
+}
+
+/**************************************************************************************************************
+ ** Function: move
+ ** Description: Player decides if they want to shoot an arrow or move to another room.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Player enters space to shoot an arrow or the 'WASD' characters to move.
+**************************************************************************************************************/
+void Game::move() {
+    bool in_bounds = false, valid = false;
+    string direction;
+    
+    if (first_move)
+        cin.ignore();
+    
+    while (!valid) {
+        cout << "Enter space to shoot an arrow (you have " << arrows << " arrow(s)), 'w' to go north, 'a' to go west, 's' to go south, or 'd' to go east.";
+        
+        direction = getch();
+        in_bounds = check_bounds(direction);
+
+        if (direction == " " && arrows == 0)
+            cout << "\nYou are out of arrows. Try again.\n" <<endl;
+        else if (direction != " " && direction != "w" && direction != "a" && direction != "s" && direction != "d")
+            cout << "\nError: Invalid input. Try again.\n" <<endl;
+        else if (!in_bounds)
+            cout << "\nError: You'll go out of bounds. Try again.\n" <<endl;
+        else
+            valid = true;
+    }
+
+    change_pos(direction);
+}
+
+/**************************************************************************************************************
+ ** Function: kill_wumpus
+ ** Description: Removes the Wumpus from the game.
+ ** Parameters: int x_pos, int y_pos
+ ** Pre-Conditions: 2 ints.
+ ** Post-Conditions: Removes the Wumpus from the game.
+**************************************************************************************************************/
+void Game::kill_wumpus(int x_pos, int y_pos) {
+    cout << "You just killed the Wumpus!" <<endl;
+    game_board[x_pos][y_pos].set_event_type(" ");
+    wumpus_dead = true;
+}
+
+/**************************************************************************************************************
+ ** Function: wake_wumpus
+ ** Description: 75% chance the Wumpus will wake up.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: If the Wumpus wakes, it'll move to a new room.
+**************************************************************************************************************/
+void Game::wake_wumpus() {
+    vector<int> wumpus_loc;
+
+    for (int x = 0; x < dimension; x++)
+        for (int i = 0; i < dimension; i++)
+            if (game_board[x][i].get_event() == "W")
+                wumpus_loc = game_board[x][i].get_room_pos();
+
+    int should_wake = rand() % 4;
+
+    if (should_wake < 3) {
+        cout << "You woke up the wumpus with your arrow and it has moved to a different room." <<endl;
+
+        vector<int> key = {rand() % dimension, rand() % dimension};
+
+        while (game_board[key[0]][key[1]].get_event() != " " || game_board[key[0]][key[1]].get_room_pos() == player_loc)
+            key = {rand() % dimension, rand() % dimension};
+        
+        cout << game_board[key[0]][key[1]].get_event() <<endl;
+        game_board[wumpus_loc[0]][wumpus_loc[1]].set_event_type(" ");
+        game_board[key[0]][key[1]].set_event_type("W");
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: shoot_north
+ ** Description: The arrow will shoot north.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The arrow will shoot north until it hits a wall or goes through 3 rooms.
+**************************************************************************************************************/
+void Game::shot_north() {
+    int rooms = 0;
+
+    for (int x = player_loc[0] - 1; x >= 0; x--) {
+        if (game_board[x][player_loc[1]].get_event() == "W") 
+            kill_wumpus(x, player_loc[1]);                
+
+        rooms++;
+
+        if (rooms == 3)
+            break;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: shoot_west
+ ** Description: The arrow will shoot west.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The arrow will shoot west until it hits a wall or goes through 3 rooms.
+**************************************************************************************************************/
+void Game::shot_west() {
+    int rooms = 0;
+
+    for (int x = player_loc[1] - 1; x >= 0; x--) {
+        if (game_board[player_loc[0]][x].get_event() == "W")
+            kill_wumpus(player_loc[0], x);
+
+        rooms++;
+
+        if (rooms == 3)
+            break;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: shoot_south
+ ** Description: The arrow will shoot south.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The arrow will shoot south until it hits a wall or goes through 3 rooms.
+**************************************************************************************************************/
+void Game::shot_south() {
+    int rooms = 0;
+
+    for (int x = player_loc[0] + 1; x < dimension; x++) {
+        if (game_board[x][player_loc[1]].get_event() == "W")
+            kill_wumpus(x, player_loc[1]);
+
+        rooms++;
+
+        if (rooms == 3)
+            break;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: shoot_east
+ ** Description: The arrow will shoot east.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The arrow will shoot east until it hits a wall or goes through 3 rooms.
+**************************************************************************************************************/
+void Game::shot_east() {
+    int rooms = 0;
+
+    for (int x = player_loc[1] + 1; x < dimension; x++) {
+        if (game_board[player_loc[0]][x].get_event() == "W")
+            kill_wumpus(player_loc[0], x);
+
+        rooms++;
+
+        if (rooms == 3)
+            break;  
+    }  
+}
+
+/**************************************************************************************************************
+ ** Function: arrow_shot
+ ** Description: The arrow will shoot in the direction the player chose.
+ ** Parameters: string direction
+ ** Pre-Conditions: 1 string.
+ ** Post-Conditions: The arrow will shoot in the direction the player chose.
+**************************************************************************************************************/
+void Game::arrow_shot(string direction) {
+    int rooms = 0;
+
+    if (direction == "w")
+        shot_north();
+    else if (direction == "a")
+        shot_west();
+    else if (direction == "s")
+        shot_south();
+    else if (direction == "d")
+        shot_east();
+
+    if (!wumpus_dead) {
+        wake_wumpus();
+        cout << "You didn't hit anything." <<endl;
+    }
+
+    arrows--;
+}
+
+/**************************************************************************************************************
+ ** Function: shoot_arrow
+ ** Description: The player picks the direction they want to shoot an arrow.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The arrow will shoot in the direction the player chooeses.
+**************************************************************************************************************/
+void Game::shoot_arrow() {
+    string shoot = "";
+    
+    while (shoot != "w" && shoot != "a" && shoot != "s" && shoot != "d") {
+        cout << "\nEnter 'w' to shoot north, 'a' to shoot west, 's' to shoot south, or 'd' to shoot east: ";
+        cin >> shoot;
+    
+        if (shoot != "w" && shoot != "a" && shoot != "s" && shoot != "d")
+            cout << "\nError: invalid input. Try again.\n" <<endl;
+    }
+    
+    arrow_shot(shoot);
+}
+
+/**************************************************************************************************************
+ ** Function: check_surroundings
+ ** Description: Checks the events in the adjacent rooms.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Calls the precept or encounter function depending on the events in the adjacent rooms.
+**************************************************************************************************************/
+void Game::check_surroundings() {
+    if (check_bounds("w"))
+        game_board[player_loc[0] - 1][player_loc[1]].room_action(true);
+    
+    if (check_bounds("a"))
+        game_board[player_loc[0]][player_loc[1] - 1].room_action(true);
+    
+    if (check_bounds("s"))
+        game_board[player_loc[0] + 1][player_loc[1]].room_action(true);
+    
+    if (check_bounds("d"))
+        game_board[player_loc[0]][player_loc[1] + 1].room_action(true);
+}
+
+/**************************************************************************************************************
+ ** Function: check_current_room
+ ** Description: Checks the event in the current room.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns an int indicating the event that took place in the room the player is in.
+**************************************************************************************************************/
+int Game::check_current_room() {
+    game_board[player_loc[0]][player_loc[1]].room_action(false);
+    
+    if (game_board[player_loc[0]][player_loc[1]].get_event() == "W" ||
+        game_board[player_loc[0]][player_loc[1]].get_event() == "P") {
+        cout << "You lost the game :(" <<endl;
+    } else if (game_board[player_loc[0]][player_loc[1]].get_event() == "E" && got_gold) {
+        cout << "\nYou won the game! :)" <<endl;
+    } else {
+        if (game_board[player_loc[0]][player_loc[1]].get_event() == "G") {
+            game_board[player_loc[0]][player_loc[1]].set_event_type(" ");
+            got_gold = true;
+        } else if (game_board[player_loc[0]][player_loc[1]].get_event() == "B") {
+            vector<int> key = {rand() % dimension, rand() % dimension};
+
+            while (player_loc == key)
+                key = {rand() % dimension, rand() % dimension};
+            
+            prev_pos = key;
+            player_loc = key;
+            
+            return 1;
+        }
+
+        return 2;
+    }
+    
+    return 3;
+}
+
+/**************************************************************************************************************
+ ** Function: win
+ ** Description: Checks if the player won.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns a bool indicating whether or not the user won the game.
+**************************************************************************************************************/
+bool Game::win() {
+    if (game_board[player_loc[0]][player_loc[1]].get_event() == "W" ||
+        game_board[player_loc[0]][player_loc[1]].get_event() == "P")
+        return false;
+    
+    return true;
+}
+
+/**************************************************************************************************************
+ ** Function: randomize_events()
+ ** Description: Randomizes the events.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The events are randomized.
+**************************************************************************************************************/
+void Game::randomize_events() {
+    for (int x = 0; x < 7; x++) {
+        vector<int> key = generate_pos();
+        start_events[x] = key;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: reset
+ ** Description: Resets the game.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The game will reset.
+**************************************************************************************************************/
+void Game::reset() {
+    string v[7] = {"P", "P", "B", "B", "W", "G", "E"};
+
+    for (int x = 0; x < dimension; x++)
+        for (int i = 0; i < dimension; i++)
+            game_board[x][i].set_event_type(" ");
+
+    for (int x = 0; x < 7; x++)
+        game_board[start_events[x][0]][start_events[x][1]].set_event_type(v[x]);
+    
+    player_loc = start_events[6];
+    prev_pos = player_loc;
+    arrows = 3;
+    got_gold = false;
+    wumpus_dead = false;
+    first_move = true;
+}AI.cpp0000660002636200531540000002336513662422064011314 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+#include "./Event.h"
+#include "./Wumpus.h"
+#include "./Bats.h"
+#include "./Pit.h"
+#include "./Gold.h"
+#include "./Room.h"
+#include "./Game.h"
+#include "./AI.h"
+#include "./Other.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: AI
+ ** Description: Parameterized constructor for the AI class.
+ ** Parameters: int dimension, string debug
+ ** Pre-Conditions: 1 int and 1 string.
+ ** Post-Conditions: Initializes the member variables in the AI class.
+**************************************************************************************************************/
+AI::AI(int dimension, string debug) : Game(dimension, debug) {
+    ai_used = true;
+    safe_rooms.assign(dimension, vector<int>(dimension));
+    move_options.assign(4, vector<int>(2));
+    prev_pos = player_loc;
+    first_move = true;
+    
+    for (int x = 0; x < dimension; x++)
+        for (int i = 0; i < dimension; i++)
+            if (game_board[x][i].get_event() == "P")
+                safe_rooms[x][i] = 1;
+            else
+                safe_rooms[x][i] = 0;
+    
+    for (int x = 0; x < 4; x++)
+        move_options[x] = {-1, -1};
+        
+    find_dead_end();
+}
+
+/**************************************************************************************************************
+ ** Function: get_ai_used
+ ** Description: Gives you the value of the ai_used variable in the AI class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the ai_used variable.
+**************************************************************************************************************/
+bool AI::get_ai_used() {
+    return ai_used;
+}
+
+/**************************************************************************************************************
+ ** Function: set_ai_used
+ ** Description: Changes the value of the ai_used variable in the AI class.
+ ** Parameters: bool n
+ ** Pre-Conditions: 1 bool.
+ ** Post-Conditions: The value of the ai_used variable is changed to a new value.
+**************************************************************************************************************/
+void AI::set_ai_used(bool n) {
+    ai_used = n;
+}
+
+/**************************************************************************************************************
+ ** Function: find_dead_end
+ ** Description: Finds any dead ends in the game.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Finds any room where there's 2 pits nearby.
+**************************************************************************************************************/
+void AI::find_dead_end() {
+    for (int x = 0; x < dimension; x++)
+        for (int i = 0; i < dimension; i++) {
+            int total_pits = 0;
+            
+            if (x - 1 > 0)
+                if (safe_rooms[x - 1][i] == 1)
+                    total_pits++;
+            else if (i - 1 > 0)
+                if (safe_rooms[x][i - 1] == 1)
+                    total_pits++;
+            else if (x + 1 < dimension)
+                if (safe_rooms[x + 1][i] == 1)
+                    total_pits++;
+            else if (i + 1 < dimension)
+                if (safe_rooms[x][i + 1] == 1)
+                    total_pits++;
+            
+            if (total_pits == 2)
+                safe_rooms[x][i] = 1;
+        }
+}
+
+/**************************************************************************************************************
+ ** Function: find_event
+ ** Description: Finds an event in the nearby rooms.
+ ** Parameters: string n
+ ** Pre-Conditions: 1 string.
+ ** Post-Conditions: Returns a bool indicating if a specfic event is nearby.
+**************************************************************************************************************/
+bool AI::find_event(string n) {
+    if (check_bounds("w"))
+        if (game_board[player_loc[0] - 1][player_loc[1]].get_event() == n)
+            return true;
+    
+    if (check_bounds("a"))
+        if (game_board[player_loc[0]][player_loc[1] - 1].get_event() == n)
+            return true;
+    
+    if (check_bounds("s"))
+        if (game_board[player_loc[0] + 1][player_loc[1]].get_event() == n)
+            return true;
+    
+    if (check_bounds("d"))
+        if (game_board[player_loc[0]][player_loc[1] + 1].get_event() == n)
+            return true;
+    
+    return false;
+}
+
+/**************************************************************************************************************
+ ** Function: ai_move
+ ** Description: Player moves to a new location.
+ ** Parameters: vector<float> displacement
+ ** Pre-Conditions: 1 vector<float>.
+ ** Post-Conditions: The player is moved to the room that's closes to the gold or exit.
+**************************************************************************************************************/
+void AI::ai_move(vector<float> displacement) {
+    int min = 0;
+    
+    for (int x = 0; x < 4; x++)
+        if (displacement[x] != 0) {
+            min = x;
+            break;
+        }
+    
+    for (int x = min; x < 4; x++)
+        if (displacement[x] < displacement[min] && displacement[x] != 0)
+            min = x;
+    
+    prev_pos = player_loc;
+    player_loc = move_options[min];
+}
+
+/**************************************************************************************************************
+ ** Function: pick_direction
+ ** Description: Calculates the displacement of each room from the gold or exit.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The displacement of each room from the gold or exit are calculated.
+**************************************************************************************************************/
+void AI::pick_direction() {
+    vector<float> displacement;
+    vector<int> v = {-1, -1};
+    int needed_event = 0;
+    int total_paths = 0;
+    
+    if (got_gold)
+        needed_event = 6;
+    else
+        needed_event = 5;
+    
+    for (int x = 0; x < 4; x++)
+        if (move_options[x] == v) {
+            displacement.push_back(0);
+        } else if (safe_rooms[move_options[x][0]][move_options[x][1]] == 0) {
+            displacement.push_back(sqrt(pow(start_events[needed_event][0] - move_options[x][0], 2) + pow(start_events[needed_event][1] - move_options[x][1], 2)));
+            total_paths++;
+        }
+    
+    if (total_paths == 0)
+        player_loc = start_events[0];
+    else
+        ai_move(displacement);
+}
+
+/**************************************************************************************************************
+ ** Function: possible_directions
+ ** Description: Finds the possible rooms the player can go to without dying or going into a wall.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The possible rooms the player can go to will be found.
+**************************************************************************************************************/
+void AI::possible_directions() {
+    vector<int> v = {-1, -1};
+    
+    for (int x = 0; x < 4; x++)
+        move_options[x] = v;
+        
+    if (check_bounds("w"))
+        if (safe_rooms[player_loc[0] - 1][player_loc[1]] == 0 && game_board[player_loc[0] - 1][player_loc[1]].get_room_pos() != prev_pos)
+            move_options[0] = game_board[player_loc[0] - 1][player_loc[1]].get_room_pos();
+            
+    if (check_bounds("a"))
+        if (safe_rooms[player_loc[0]][player_loc[1] - 1] == 0 && game_board[player_loc[0]][player_loc[1] - 1].get_room_pos() != prev_pos)
+            move_options[1] = game_board[player_loc[0]][player_loc[1] - 1].get_room_pos();
+    
+    if (check_bounds("s"))
+        if (safe_rooms[player_loc[0] + 1][player_loc[1]] == 0 && game_board[player_loc[0] + 1][player_loc[1]].get_room_pos() != prev_pos)
+            move_options[2] = game_board[player_loc[0] + 1][player_loc[1]].get_room_pos();
+                
+    if (check_bounds("d"))
+        if (safe_rooms[player_loc[0]][player_loc[1] + 1] == 0 && game_board[player_loc[0]][player_loc[1] + 1].get_room_pos() != prev_pos)
+            move_options[3] = game_board[player_loc[0]][player_loc[1] + 1].get_room_pos();
+
+    pick_direction();
+}
+
+/**************************************************************************************************************
+ ** Function: decide_action
+ ** Description: The AI will decide to shoot an arrow or move to another room.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The AI will decide to shoot an arrow or move to another room.
+**************************************************************************************************************/
+void AI::decide_action() {
+    if (find_event("W")) {
+        game_board[start_events[4][0]][start_events[4][1]].set_event_type(" ");
+        cout << "You just killed the Wumpus!" <<endl;
+        arrows--;
+    }
+
+    if (find_event("E") && got_gold) {
+        player_loc = start_events[6];
+    } else if (find_event("G")) {
+        prev_pos = start_events[5];
+        player_loc = start_events[5];
+    } else {
+        possible_directions();
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: play_AI
+ ** Description: Runs the AI.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: The game will be played using AI.
+**************************************************************************************************************/
+void AI::play_AI() {
+    int game_room = 2;
+    
+    while (game_room != 3) {
+        print_board();
+        check_surroundings();
+        
+        cout << "You have " << arrows << " arrow(s) left." <<endl;
+        
+        decide_action();
+        
+        game_room = check_current_room();
+  
+        while(game_room == 1)
+            game_room = check_current_room();
+    }
+}Other.cpp0000660002636200531540000001730013663030153012067 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+#include "./Event.h"
+#include "./Wumpus.h"
+#include "./Bats.h"
+#include "./Pit.h"
+#include "./Gold.h"
+#include "./Room.h"
+#include "./Game.h"
+#include "./AI.h"
+#include "./Other.h"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: getch
+ ** Description: Allows the user to enter a char without entering space.
+ ** Parameters: void
+ ** Pre-Conditions: 1 void.
+ ** Post-Conditions: The user can enter a char without entering space.
+**************************************************************************************************************/
+int getch(void) {
+    int x;
+    struct termios old_val, new_val;
+    
+    tcgetattr(STDIN_FILENO, &old_val);
+    
+    new_val = old_val;
+    new_val.c_lflag &= ~(ICANON | ECHO);
+    
+    tcsetattr(STDIN_FILENO, TCSANOW, &new_val);
+    
+    x = getchar();
+    
+    tcsetattr(STDIN_FILENO, TCSANOW, &old_val);
+    
+    return x;
+}
+
+/**************************************************************************************************************
+ ** Function: is_int
+ ** Description: Determines if the input is an integer.
+ ** Parameters: string n
+ ** Pre-Conditions: 1 string.
+ ** Post-Conditions: Returns a bool indicating if the input is an int.
+**************************************************************************************************************/
+bool is_int(string n) {
+    for (int x = 0; x < n.size(); x++)
+        if (n[x] < '0' || n[x] > '9')
+            return false;
+    
+    return true;
+}
+
+/**************************************************************************************************************
+ ** Function: check_comm_line
+ ** Description: Checks if the command line inputs are valid.
+ ** Parameters: int argc, char* argv[]
+ ** Pre-Conditions: 1 int and 1 char**.
+ ** Post-Conditions: Returns a bool indicating if the command line inputs are valid.
+**************************************************************************************************************/
+bool check_comm_line(int argc, char* argv[]) {
+    if (argc < 3) {
+        cout << "Two command line inputs are needed." <<endl;
+    } else if (argc > 3) {
+        cout << "There are too many command line inputs." <<endl;
+    } else if (argc == 3) {
+        if ((strcmp(argv[2], "false") == 0 || strcmp(argv[2], "true") == 0) && (atoi(argv[1]) >= 4))
+            return true;
+            
+        if (atoi(argv[1]) < 4)
+            cout << "Enter at least 4 rooms." <<endl;
+        
+        if (strcmp(argv[2], "false") != 0 && strcmp(argv[2], "true") != 0)
+            cout << "A boolean is needed." <<endl;
+    }
+
+    return false;
+}
+
+/**************************************************************************************************************
+ ** Function: use_AI
+ ** Description: User picks if they want to use AI or play the game themselves.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns a bool to indicate how the user wants to play the game.
+**************************************************************************************************************/
+bool use_AI() {
+    int choice = 0;
+    
+    while (choice != 1 && choice != 2) {
+        cout << "\nEnter 1 to use AI or 2 if you want to play the game yourself: ";
+        cin >> choice;
+        
+        if (choice != 1 && choice != 2) {
+            cin.clear();
+            cin.ignore(256, '\n');
+            cout << "Error: invalid input. Try again." <<endl;
+        }
+    }
+    
+    if (choice == 1)
+        return true;
+    else if (choice == 2)
+        return false;
+}
+
+/**************************************************************************************************************
+ ** Function: play_game
+ ** Description: Sets up the game based on how the user wants to play.
+ ** Parameters: AI &ai
+ ** Pre-Conditions: 1 AI&.
+ ** Post-Conditions: The game will be played based on how the user wants to play.
+**************************************************************************************************************/
+void play_game(AI &ai) {
+    int game_room = 2;
+
+    if (!use_AI()) {
+        ai.set_ai_used(false);
+        
+        while (game_room != 3) {
+            ai.print_board();
+            ai.check_surroundings();
+            ai.move();
+            
+            game_room = ai.check_current_room();
+      
+            while(game_room == 1)
+                game_room = ai.check_current_room();
+        }
+    } else {
+        ai.set_ai_used(true);
+        ai.play_AI();
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: play_again
+ ** Description: User decides if they want to play again with the same or different cave or to exit.
+ ** Parameters: AI &ai
+ ** Pre-Conditions: 1 AI&.
+ ** Post-Conditions: Returns a string indicating if the user wants to play again or exit.
+**************************************************************************************************************/
+string play_again(AI &ai) {
+    string choice = "";
+    
+    if (ai.get_ai_used())
+        cin.ignore();
+
+    while (choice != "1" && choice != "2" && choice != "3") {
+        cout << "\nEnter 1 to start over with the same cave, 2 to start over with a new cave, or 3 to exit: ";
+        getline(cin, choice);
+
+        if (choice != "1" && choice != "2" && choice != "3")
+            cout << "Error: invalid input. Try again." <<endl;
+    }
+    
+    if (choice == "2") 
+        choice = change_cave(ai);
+
+    return choice;
+}
+
+
+/**************************************************************************************************************
+ ** Function: change_cave
+ ** Description: User decides if they want to randomize the events or make a whole new cave.
+ ** Parameters: AI &ai
+ ** Pre-Conditions: 1 AI&.
+ ** Post-Conditions: Returns a string indicating how they want to change the cave.
+**************************************************************************************************************/
+string change_cave(AI &ai) {
+    string choice = "";
+    
+    while (choice != "1" && choice != "2") {
+        cout << "\nEnter 1 use the same layout but randomize the events or enter 2 to make a whole new cave: ";
+        getline(cin, choice);
+        
+        if (choice != "1" && choice != "2")
+            cout << "Error: invalid input. Try again." <<endl;
+    }
+    
+    if (choice == "1")
+        ai.randomize_events();
+  
+    return choice;
+}
+
+/**************************************************************************************************************
+ ** Function: new_values
+ ** Description: User enters the new values for a new cave.
+ ** Parameters: int &game_dimension, string &debug
+ ** Pre-Conditions: 1 int& and 1 string&.
+ ** Post-Conditions: The user will enter the new game dimension and the mode they want.
+**************************************************************************************************************/
+void new_values(int &game_dimension, string &debug) {
+    int new_dimension = 0;
+    string new_debug = "";
+
+    while (new_dimension < 4) {
+        cout << "\nEnter the new game dimension: ";
+        cin >> new_dimension;
+
+        if (new_dimension < 4) {
+            cin.clear();
+            cin.ignore(256, '\n');
+            cout << "Error: invalid input. Try again." <<endl;
+        }
+    }
+
+    cin.ignore();
+
+    while (new_debug != "false" && new_debug != "true") {
+        cout << "Enter the mode you want: ";
+        getline(cin, new_debug);
+
+        if (new_debug != "false" && new_debug != "true")
+            cout << "Error: invalid input. Try again.\n" <<endl;
+    }
+
+    game_dimension = new_dimension;
+    debug = new_debug;
+}wumpus.cpp0000660002636200531540000000241613662422307012355 0ustar  lichelupg11506#include <iostream>
+#include <string> 
+#include <vector>
+#include <ctime>
+#include <cstring>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <math.h>
+#include "./Event.h"
+#include "./Wumpus.h"
+#include "./Bats.h"
+#include "./Pit.h"
+#include "./Gold.h"
+#include "./Room.h"
+#include "./Game.h"
+#include "./AI.h"
+#include "./Other.h"
+
+using namespace std;
+
+/******************************************************
+** Program: wumpus.cpp
+** Author: Chelsea Li
+** Date: 5/24/20
+** Description: Hunt the Wumpus!
+** Input: 1 int and 1 bool
+** Output: Hunt the Wumpus game.
+******************************************************/
+int main(int argc, char* argv[]) {
+    if (check_comm_line(argc, argv)) {
+        string new_game = "";
+        int game_dimension = atoi(argv[1]);
+        string debug = argv[2];
+        AI ai(game_dimension, debug);
+
+        while (new_game != "3") {
+            play_game(ai);
+
+            if (!ai.win())
+                new_game = play_again(ai);
+            else
+                new_game = "3";
+
+            if (new_game == "1") {
+                ai.reset();
+            } else if (new_game == "2") {
+                new_values(game_dimension, debug);
+                ai = AI(game_dimension, debug);
+            }
+        }
+    } 
+
+    return 0;
+}Makefile0000660002636200531540000000056313662375030011752 0ustar  lichelupg11506CC = g++ -std=c++11
+
+exe_file = assign4_exe
+
+$(exe_file): Room.o Game.o AI.o Other.o wumpus.o
+	$(CC) Room.o Game.o AI.o Other.o wumpus.o -o $(exe_file)
+Room.o: Room.cpp
+	$(CC) -c Room.cpp
+Game.o: Game.cpp
+	$(CC) -c Game.cpp
+AI.o: AI.cpp
+	$(CC) -c AI.cpp
+Other.o: Other.cpp
+	$(CC) -c Other.cpp
+wumpus.o: wumpus.cpp
+	$(CC) -c wumpus.cpp
+clean:
+	rm -f *.out *.o $(exe_file)
