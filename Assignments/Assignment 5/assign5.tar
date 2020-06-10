@@ -1,0 +1,705 @@
+Linked_List.hpp0000660002636200531540000003002713670256407013227 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <stdexcept>
+#include "./Node.hpp"
+
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
+
+using namespace std;
+
+template <class T>
+class Linked_List {
+    private:
+        unsigned int length;
+        Node<T> *head; 
+
+    public:
+        Linked_List();
+        ~Linked_List();
+        int get_length();
+        Node<T>** get_head();
+        bool check_primes(T);
+        void print();
+        void clear();
+        unsigned int push_front(T);
+        unsigned int push_back(T);
+        unsigned int insert(T, unsigned int);
+        void split(Node<T>*, Node<T>**, Node<T>**);
+        void merge_sort(Node<T>**);
+        void sort_ascending(Node<T>**, Node<T>*, Node<T>*);
+        void sort_descending(Node<T>**);
+        void swap(Node<T>**, Node<T>*, Node<T>*, Node<T>*);
+};
+
+/**************************************************************************************************************
+ ** Function: Linked_List
+ ** Description: Default constructor for the Linked_List class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Initializes the member variables in the Linked_List class.
+**************************************************************************************************************/
+template <class T>
+Linked_List<T>::Linked_List() {
+    length = 0;
+    head = NULL;
+}
+
+/**************************************************************************************************************
+ ** Function: Linked_List
+ ** Description: Destructor for the Linked_List class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Deletes all dynamically allocated memory in the Linked_List class.
+**************************************************************************************************************/
+template <class T>
+Linked_List<T>::~Linked_List() {
+    delete head;
+    head = NULL;
+}
+
+/**************************************************************************************************************
+ ** Function: get_length
+ ** Description: Gives you the value of the length variable in the Linked_List class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the length variable.
+**************************************************************************************************************/
+template <class T>
+int Linked_List<T>::get_length() {
+    return length;
+}
+
+/**************************************************************************************************************
+ ** Function: get_head
+ ** Description: Gives you the value of the head variable in the Linked_List class.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns the value of the head variable.
+**************************************************************************************************************/
+template <class T>
+Node<T>** Linked_List<T>::get_head() {
+    return &head;
+}
+
+/**************************************************************************************************************
+ ** Function: check_primes
+ ** Description: Recursivly determines if a number is prime.
+ ** Parameters: T num
+ ** Pre-Conditions: 1 template variable.
+ ** Post-Conditions: Returns a bool indicating if the number is prime.
+**************************************************************************************************************/
+template <class T>
+bool Linked_List<T>::check_primes(T num) {
+    if (num < 2)
+        return false;
+    else if (num == 2 || num == 3)
+        return true;
+    else 
+        if ((num + 1) % 6 == 0 || (num - 1) % 6 == 0)
+            return true;
+        else
+            return false;
+}
+
+/**************************************************************************************************************
+ ** Function: print
+ ** Description: Prints out the values in the linked list.
+ ** Parameters: None
+ ** Pre-Conditions: None
+ ** Post-Conditions: The values in the linked list are printed.
+**************************************************************************************************************/
+template <class T>
+void Linked_List<T>::print() {
+    int primes = 0;
+    Node<T>* other_head = head;
+
+    cout << "Your linked list is: ";
+
+    while (other_head != NULL) { 
+        if (check_primes(other_head->val))
+            primes++;
+
+        cout << other_head->val << " "; 
+        other_head = other_head->next; 
+    } 
+
+    cout << "\nYou have " << primes << " prime number(s) in your list." <<endl;
+}
+
+/**************************************************************************************************************
+ ** Function: clear
+ ** Description: Clears the values in the linked list.
+ ** Parameters: None
+ ** Pre-Conditions: None
+ ** Post-Conditions: The linked list is empty.
+**************************************************************************************************************/
+template <class T>
+void Linked_List<T>::clear() {
+    Node<T>* current_node = head;
+    
+    while (current_node) {
+        head = current_node->next;
+        delete current_node;
+        current_node = head;
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: push_front
+ ** Description: Adds a new node to the front of the linked list.
+ ** Parameters: T n
+ ** Pre-Conditions: 1 template variable
+ ** Post-Conditions: A new value is added to the front of the linked list.
+**************************************************************************************************************/
+template <class T>
+unsigned int Linked_List<T>::push_front(T n) {
+    Node<T>* new_node = new Node<T>;
+    new_node->val = n;
+    new_node->next = head;
+    head = new_node;
+    
+    length++;
+
+    return length;
+}
+
+/**************************************************************************************************************
+ ** Function: push_back
+ ** Description: Adds a new node to the back of the linked list.
+ ** Parameters: T n
+ ** Pre-Conditions: 1 template variable
+ ** Post-Conditions: A new value is added to the back of the linked list.
+**************************************************************************************************************/
+template <class T>
+unsigned int Linked_List<T>::push_back(T n) {
+    Node<T>* new_node = new Node<T>; 
+    Node<T>* last_node = head;
+      
+    new_node->val = n;  
+    new_node->next = NULL;  
+
+    if (head == NULL)  {  
+        head = new_node;
+    } else {
+        while (last_node->next != NULL)  
+            last_node = last_node->next;  
+        
+        last_node->next = new_node;  
+    }
+    
+    length++;
+    
+    return length; 
+}
+
+/**************************************************************************************************************
+ ** Function: insert
+ ** Description: Adds a new node to the linked list.
+ ** Parameters: T val, unsigned int index
+ ** Pre-Conditions: 1 template variable and 1 unsigned int
+ ** Post-Conditions: A new value is added to the linked list.
+**************************************************************************************************************/
+template <class T>
+unsigned int Linked_List<T>::insert(T val, unsigned int index) {
+    if (index < 0 || index > length) {
+        cout << "Error: index out of bounds" <<endl;
+    } else if (index == 0)  {
+        length = push_front(val);
+    } else if (index == length) {
+        length = push_back(val);
+    } else {
+        Node<T>* current = head;
+        Node<T>* new_node = new Node<T>;
+
+        new_node->val = val;
+        new_node->next = NULL;
+
+        while (index-- > 1) 
+            current = current->next; 
+
+        new_node->next = current->next; 
+        current->next = new_node; 
+        
+        length++;
+    }
+
+    return length;
+}
+
+/**************************************************************************************************************
+ ** Function: split
+ ** Description: Splits the linked list in half.
+ ** Parameters: Node<T>* current, Node<T>** front, Node<T>** back
+ ** Pre-Conditions: 1 Node<T>* and 2 Node<T>**.
+ ** Post-Conditions: The linked list is split in half.
+**************************************************************************************************************/
+template <class T>
+void Linked_List<T>::split(Node<T>* current, Node<T>** front, Node<T>** back) {
+    Node<T>* f = current->next; 
+    Node<T>* b = current; 
+  
+    while (f != NULL) { 
+        f = f->next; 
+
+        if (f != NULL) { 
+            b = b->next; 
+            f = f->next; 
+        } 
+    } 
+
+    *front = current; 
+    *back = b->next; 
+    b->next = NULL; 
+}
+
+/**************************************************************************************************************
+ ** Function: merge_sort
+ ** Description: Using merge sort to sort the values in the linked list in ascending order.
+ ** Parameters: Node<T>** other_head
+ ** Pre-Conditions: 1 Node<T>**.
+ ** Post-Conditions: A sorted list in ascending order.
+**************************************************************************************************************/
+template <class T>
+void Linked_List<T>::merge_sort(Node<T>** other_head) {
+    Node<T>* new_head = *other_head;
+    Node<T>* a;
+    Node<T>* b;
+
+    if (new_head != NULL && new_head->next != NULL) {
+        split(new_head, &a, &b);
+        merge_sort(&a);
+        merge_sort(&b);
+        sort_ascending(other_head, a, b);
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: sort_acending
+ ** Description: Sorts the values in ascending order.
+ ** Parameters: Node<T>** other_head, Node<T>* a, Node<T>* b
+ ** Pre-Conditions: 1 Node<T>** and 2 Node<T>*.
+ ** Post-Conditions: The values are sorted in ascending order.
+**************************************************************************************************************/
+template <class T>
+void Linked_List<T>::sort_ascending(Node<T>** other_head, Node<T>* a, Node<T>* b) {
+    if (a == NULL) {
+        *other_head = b;
+    } else if (b == NULL) {
+        *other_head = a;
+    } else {
+        if (a->val <= b->val) {
+            *other_head = a;
+            sort_ascending(&(*other_head)->next, a->next, b);
+        } else {
+            *other_head = b;
+            sort_ascending(&(*other_head)->next, a, b->next);
+        }
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: sort_descending
+ ** Description: Sorts the values in the linked list in descending order.
+ ** Parameters: Node<T>** other_head
+ ** Pre-Conditions: 1 Node<T>**.
+ ** Post-Conditions: The values in the linked list is sorted in descending order.
+**************************************************************************************************************/
+template <class T>
+void Linked_List<T>::sort_descending(Node<T>** other_head) {
+    if ((*other_head) != NULL) {
+        if ((*other_head)->next != NULL) {
+            Node<T>* max = *other_head;
+            Node<T>* prevMax = NULL;
+            Node<T>* ptr = *other_head;
+            
+            while (ptr->next != NULL) {
+                if (ptr->next->val > max->val) {
+                    max = ptr->next;
+                    prevMax = ptr;
+                }
+                
+                ptr = ptr->next;
+            }
+            
+            if (max != *other_head)
+                swap(other_head, *other_head, max, prevMax);
+            
+            sort_descending(&(*other_head)->next);
+        }
+    }
+}
+
+/**************************************************************************************************************
+ ** Function: swap
+ ** Description: Values are swapped
+ ** Parameters: Node<T>** other_head_ref, Node<T>* other_head, Node<T>* max, Node<T>* prevMax
+ ** Pre-Conditions: 1 Node<T>** and 3 Node<T>*.
+ ** Post-Conditions: Values are swapped.
+**************************************************************************************************************/
+template <class T>
+void Linked_List<T>::swap(Node<T>** other_head_ref, Node<T>* other_head, Node<T>* max, Node<T>* prevMax) {
+    *other_head_ref = max;
+    prevMax->next = other_head;
+    
+    Node<T>* temp = max->next;
+    max->next = other_head->next;
+    other_head->next = temp;
+}
+
+#endifNode.hpp0000660002636200531540000000034113666376700011713 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <stdexcept>
+
+#ifndef NODE_H
+#define NODE_H
+
+using namespace std;
+
+template <class T>
+class Node {
+    public:
+        T val;
+        Node<T> *next;
+};
+
+#endifOther.hpp0000660002636200531540000000076613666376730012125 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <stdexcept>
+#include "./Linked_List.hpp"
+
+#ifndef OTHER_H
+#define OTHER_H
+
+using namespace std;
+
+int int_or_unsigned();
+unsigned int enter_num_int(Linked_List<int>&, int);
+unsigned int more_nums_int(Linked_List<int>&);
+unsigned int enter_num_unsigned(Linked_List<unsigned int>&, int);
+unsigned int more_nums_unsigned(Linked_List<unsigned int>&);
+string choose_mode();
+string start_over();
+void int_list();
+void unsigned_list();
+
+#endifOther.cpp0000660002636200531540000002046713670256521012106 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <stdexcept>
+#include "./Linked_List.hpp"
+#include "./Other.hpp"
+
+using namespace std;
+
+/**************************************************************************************************************
+ ** Function: int_or_unsigned
+ ** Description: User decides if they want to enter ints or unsigned ints.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns an int indicating what datatype the user wants to use.
+**************************************************************************************************************/
+int int_or_unsigned() {
+    int choice = 0;
+
+    while (choice != 1 && choice != 2) {
+        cout << "Enter 1 to enter ints or 2 to enter unsigned ints: ";
+        cin >> choice;
+
+        if (choice != 1 && choice != 2) {
+            cin.clear();
+            cin.ignore(256, '\n');
+            cout << "Error: enter 1 or 2.\n" <<endl;
+        }
+    }
+
+    return choice;
+}
+
+/**************************************************************************************************************
+ ** Function: enter_num_int
+ ** Description: User enters an int to add to the linked list.
+ ** Parameters: Linked_List<int> &list, int index
+ ** Pre-Conditions: 1 Linked_List<int>& and 1 int.
+ ** Post-Conditions: Returns the new list length.
+**************************************************************************************************************/
+unsigned int enter_num_int(Linked_List<int> &list, int index) {
+    bool valid_num = false;
+    string num = "";
+
+    while (!valid_num) {
+        cout << "Enter a number: ";
+    
+        try {
+            cin >> num;
+    
+            for (int x = 0; x < num.length(); x++)
+                if (num[x] == '-' && x == 0)
+                    continue;
+                else if (num[x] < '0' || num[x] > '9')
+                    throw invalid_argument("Error: ints only.\n");
+            
+            stoi(num);
+            valid_num = true;
+        } catch (const invalid_argument& ia) {
+            cout << ia.what() <<endl;
+        } catch (out_of_range const&) {
+            cout << "Error: out of range.\n" <<endl;
+        }
+    }
+
+    return list.insert(stoi(num), index);
+}
+
+/**************************************************************************************************************
+ ** Function: more_nums_int
+ ** Description: User enters chooses to add more numbers to the linked list.
+ ** Parameters: Linked_List<int> &list
+ ** Pre-Conditions: 1 Linked_List<int>&.
+ ** Post-Conditions: Returns the new list length.
+**************************************************************************************************************/
+unsigned int more_nums_int(Linked_List<int> &list) {
+    bool valid = false;
+    int length = 0;
+    string num = "", add = "";
+
+    while (!valid) {
+        cout << "Do you want another num (y or n): ";
+        cin >> add;
+
+        if (add == "y")
+            length = enter_num_int(list, list.get_length());
+        else if (add != "y" && add != "n")
+            cout << "Error: enter y or n.\n" <<endl;
+        else if (add == "n")
+            valid = true;
+    }
+
+    return length;
+}
+
+/**************************************************************************************************************
+ ** Function: enter_num_unsigned
+ ** Description: User enters an unsigned int to add to the linked list.
+ ** Parameters: Linked_List<int> &list, int index
+ ** Pre-Conditions: 1 Linked_List<int>& and 1 int.
+ ** Post-Conditions: Returns the new list length.
+**************************************************************************************************************/
+unsigned int enter_num_unsigned(Linked_List<unsigned int> &list, int index) {
+    bool valid_num = false;
+    string num = "";
+
+    while (!valid_num) {
+        cout << "Enter a number: ";
+        
+        try {
+            cin >> num;
+
+            for (int x = 0; x < num.length(); x++)    
+                if (num[x] < '0' || num[x] > '9')
+                    throw invalid_argument("Error: unsigned ints only.\n");
+            
+            stoul(num);
+            valid_num = true;
+        } catch (const invalid_argument& ia) {
+            cout << ia.what() <<endl;
+        } catch (out_of_range const&) {
+            cout << "Error: out of range.\n" <<endl;
+        }
+    }
+
+    return list.insert(stoul(num), index);
+}
+
+/**************************************************************************************************************
+ ** Function: more_nums_unsigned
+ ** Description: User enters chooses to add more numbers to the linked list.
+ ** Parameters: Linked_List<int> &list
+ ** Pre-Conditions: 1 Linked_List<int>&.
+ ** Post-Conditions: Returns the new list length.
+**************************************************************************************************************/
+unsigned int more_nums_unsigned(Linked_List<unsigned int> &list) {
+    bool valid = false;
+    int length = 0;
+    string num = "", add = "";
+
+    while (!valid) {
+        cout << "Do you want another num (y or n): ";
+        cin >> add;
+
+        if (add == "y")
+            length = enter_num_unsigned(list, list.get_length());
+        else if (add != "y" && add != "n")
+            cout << "Error: enter y or n.\n" <<endl;
+        else if (add == "n")
+            valid = true;
+    }
+
+    return length;
+}
+
+/**************************************************************************************************************
+ ** Function: choose_mode
+ ** Description: User enters chooses the sorting mode they want.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns sorting mode the user chooses.
+**************************************************************************************************************/
+string choose_mode() {
+    string sort_mode = "";
+
+    while (sort_mode != "a" && sort_mode != "d") {
+        cout << "Sort acending or descending (a or d)? ";
+        cin >> sort_mode;
+
+        if (sort_mode != "a" && sort_mode != "d")
+            cout << "Error: enter a or d.\n" <<endl; 
+    }
+
+    return sort_mode;
+}
+
+/**************************************************************************************************************
+ ** Function: start_over
+ ** Description: User enters chooses to start over or end the program.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: Returns a string indicating if the user wants to start over or end the program.
+**************************************************************************************************************/
+string start_over() {
+    string end = "";
+
+    while (end != "y" && end != "n") {
+        cout << "Do you want to do this again (y or n)? ";
+        cin >> end;
+
+        if (end != "y" && end != "n")
+            cout << "Error: enter y or n.\n" <<endl;
+    }
+
+    cout <<endl;
+
+    return end;
+}
+
+/**************************************************************************************************************
+ ** Function: int_list
+ ** Description: Creates a linked list with ints.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: A linked list with ints is created.
+**************************************************************************************************************/
+void int_list() {
+    Linked_List<int> list;
+
+    int length = 0;
+    string sort_mode = "";
+
+    length = enter_num_int(list, 0);
+    length = more_nums_int(list);
+    sort_mode = choose_mode();
+
+    if (sort_mode == "a")
+        list.merge_sort(list.get_head());
+    else if (sort_mode == "d")
+        list.sort_descending(list.get_head());    
+    
+    list.print();
+    list.clear();
+}
+
+/**************************************************************************************************************
+ ** Function: unsigned_list
+ ** Description: Creates a linked list with unsigned ints.
+ ** Parameters: None
+ ** Pre-Conditions: None.
+ ** Post-Conditions: A linked list with unsigned ints is created.
+**************************************************************************************************************/
+void unsigned_list() {
+    Linked_List<unsigned int> list;
+
+    int length = 0;
+    string sort_mode = "";
+
+    length = enter_num_unsigned(list, 0);
+    length = more_nums_unsigned(list);
+    sort_mode = choose_mode();
+
+    if (sort_mode == "a")
+        list.merge_sort(list.get_head());
+    else if (sort_mode == "d")
+        list.sort_descending(list.get_head());   
+        
+    list.print();
+    list.clear();
+}linked_list.cpp0000660002636200531540000000121513666377163013327 0ustar  lichelupg11506#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <stdexcept>
+#include "./Other.hpp"
+
+using namespace std;
+
+/******************************************************
+** Program: linked_list.cpp
+** Author: Chelsea Li
+** Date: 5/24/20
+** Description: Sorting linked lists
+** Input: None
+** Output: Sorted linked lists
+******************************************************/
+int main() {
+    string end = "y";
+    
+	while (end == "y") {
+        int option = int_or_unsigned();
+
+        if (option == 1)
+            int_list();
+        else if (option == 2)
+            unsigned_list();
+
+        end = start_over();
+    }    
+
+    return 0;
+}readme.txt0000660002636200531540000000263513666534225012321 0ustar  lichelupg11506Chelsea Li
+933-294-417
+CS162-012
+Assignment 5
+6/7/20
+
+Description: 
+My program creates a linked list that stores ints or unsigned ints (depending on the user's choice). The program then sorts the linked list in ascending order with merge sort or descending order with selection sort. Finally that program will count the total number of prime numbers in the list.
+
+Instructions:
+1. The user will first enter an int indicating if they want to enter ints or unsigned ints for the linked list.
+2. The user will then enter a number they want to add to the list.
+3. The user will either enter char 'y' to enter another number or 'n' to stop entering numbers.
+4. The user will enter char 'a' to sort the list in ascending order or 'd' to sort in descending order.
+5. The program will print out the sorted list as well as the number of prime numbers in the list.
+6. Lastly, the user will enter char 'y' to create a new list or 'n' to end the program.
+
+Limitations:
+The program doesn't check if the user enters more than one string on the same line.
+
+Extra Credit:
+I converted the Linked_List and Node class to a template class so that I can use the same class to store either ints or unsigned ints. I also implemented sort_descending() using a recurive selection sort algorithm.
+
+Works Cited:
+https://www.geeksforgeeks.org/merge-sort-for-linked-list/
+https://www.geeksforgeeks.org/recursive-selection-sort-singly-linked-list-swapping-node-links/Makefile0000660002636200531540000000040213666376240011752 0ustar  lichelupg11506CC = g++ -g -std=c++11
+
+exe_file = assign5_exe
+
+$(exe_file): Other.o linked_list.o
+	$(CC) Other.o linked_list.o -o $(exe_file)
+Other.o: Other.cpp
+	$(CC) -c Other.cpp
+linked_list.o: linked_list.cpp
+	$(CC) -c linked_list.cpp
+clean:
+	rm -f *.out *.o $(exe_file)
