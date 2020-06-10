@@ -1,0 +1,1 @@
+This program uses merge sort to sort the values in a linked list in ascending order and selection sort for descending order. The program also counts the number of prime numbers in the list.
